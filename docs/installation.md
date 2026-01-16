@@ -6,7 +6,13 @@ This guide explains how to install and configure the Actions-as-Markdown Framewo
 
 ## Overview
 
-The Actions-as-Markdown Framework is designed to be installed in your repository as a set of workflows, tools, and configuration files. Once installed, you can define custom actions specific to your needs and propose/execute them through pull requests.
+The Actions-as-Markdown Framework is designed to be installed in your repository as a git submodule. This allows you to easily update to new framework versions by updating the submodule reference. Once installed, you can define custom actions specific to your needs and propose/execute them through pull requests.
+
+**Benefits of submodule installation:**
+- Easy updates: Pull new framework versions with a simple `git submodule update`
+- Version control: Pin to specific framework versions or tags
+- Separation: Framework code stays separate from your custom actions
+- No duplication: Share the same framework code across multiple repositories
 
 ---
 
@@ -20,48 +26,92 @@ The Actions-as-Markdown Framework is designed to be installed in your repository
 
 ## Installation Steps
 
-### Step 1: Copy Framework Files to Your Repository
+### Step 1: Add Framework as Git Submodule (Recommended)
 
-Clone or download the framework repository and copy the following directories to your repository:
+Adding the framework as a git submodule allows you to easily update to new versions by updating the submodule reference.
 
 ```bash
-# From the framework repository, copy these directories:
-cp -r tools/ /path/to/your-repo/
-cp -r schemas/ /path/to/your-repo/
-cp -r scripts/ /path/to/your-repo/
-cp -r actions/ /path/to/your-repo/
+# Navigate to your repository
+cd /path/to/your-repo
 
-# Copy the requirements file
-cp requirements.txt /path/to/your-repo/
+# Add the framework as a submodule
+git submodule add https://github.com/gantrior/git-actions.git .github/actions-framework
+
+# Initialize and update the submodule
+git submodule update --init --recursive
+
+# Commit the submodule addition
+git add .gitmodules .github/actions-framework
+git commit -m "Add actions-as-markdown framework as submodule"
 ```
 
-**Alternatively, you can manually create the directory structure:**
+**To update the framework to the latest version later:**
+
+```bash
+# Update the submodule to the latest version
+cd .github/actions-framework
+git pull origin main
+cd ../..
+
+# Commit the updated submodule reference
+git add .github/actions-framework
+git commit -m "Update actions-framework to latest version"
+```
+
+**To update to a specific version/tag:**
+
+```bash
+cd .github/actions-framework
+git checkout v0.0.3  # or any specific tag/version
+cd ../..
+git add .github/actions-framework
+git commit -m "Update actions-framework to v0.0.3"
+```
+
+**Alternative: Copy Framework Files (Not Recommended)**
+
+If you prefer not to use submodules, you can copy the framework files directly:
+
+```bash
+# Clone the framework repository
+git clone https://github.com/gantrior/git-actions.git /tmp/actions-framework
+
+# Copy framework files to your repository
+cp -r /tmp/actions-framework/tools/ /path/to/your-repo/
+cp /tmp/actions-framework/requirements.txt /path/to/your-repo/
+
+# Clean up
+rm -rf /tmp/actions-framework
+```
+
+**Note**: With this approach, you'll need to manually update files when new framework versions are released.
+
+**After installation, your repository structure will be:**
 
 ```text
 your-repo/
 ├── .github/
+│   ├── actions-framework/          # Git submodule (framework code)
+│   │   ├── tools/
+│   │   │   ├── parser.py
+│   │   │   ├── editor.py
+│   │   │   ├── validator.py
+│   │   │   └── executor.py
+│   │   └── requirements.txt
 │   └── workflows/
 │       ├── pr-validation.yml
 │       └── execute-actions.yml
 ├── actions/
-│   └── allowlist.yaml
+│   └── allowlist.yaml              # Your custom action definitions
 ├── schemas/
 │   └── (your custom schemas here)
-├── scripts/
-│   └── (your custom action scripts here)
-├── tools/
-│   ├── parser.py
-│   ├── editor.py
-│   ├── validator.py
-│   ├── executor.py
-│   ├── pr_validator.py
-│   └── action_executor.py
-└── requirements.txt
+└── scripts/
+    └── (your custom action scripts here)
 ```
 
 ### Step 2: Set Up GitHub Actions Workflows
 
-Create two workflow files in your repository's `.github/workflows/` directory:
+Create two workflow files in your repository's `.github/workflows/` directory. These workflows reference the framework tools from the submodule.
 
 #### PR Validation Workflow
 
@@ -88,6 +138,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Important: checkout submodules
       
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -96,12 +148,12 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r .github/actions-framework/requirements.txt
       
       - name: Validate action files
         id: validation
         run: |
-          PYTHONPATH=. python tools/pr_validator.py --file "actions/*.md"
+          PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/pr_validator.py --file "actions/*.md"
       
       - name: Validation summary
         if: always()
@@ -146,6 +198,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive  # Important: checkout submodules
       
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -154,7 +207,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r .github/actions-framework/requirements.txt
       
       - name: Execute actions
         id: execution
@@ -165,7 +218,7 @@ jobs:
           # JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           # SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
-          PYTHONPATH=. python tools/action_executor.py --file "actions/*.md" --commit
+          PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/action_executor.py --file "actions/*.md" --commit
       
       - name: Execution summary
         if: always()
@@ -357,7 +410,7 @@ Update `.github/workflows/execute-actions.yml` to include the secret:
     GITHUB_RUN_ID: ${{ github.run_id }}
     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}  # Add this line
   run: |
-    PYTHONPATH=. python tools/action_executor.py --file "actions/*.md" --commit
+    PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/action_executor.py --file "actions/*.md" --commit
 ```
 
 ### Step 5: Test Your Installation
@@ -387,10 +440,10 @@ meta: {}
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+pip install -r .github/actions-framework/requirements.txt
 
 # Validate the action file
-PYTHONPATH=. python tools/pr_validator.py --file actions/2026-01-16.md
+PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/pr_validator.py --file actions/2026-01-16.md
 ```
 
 You should see output like:
@@ -478,15 +531,34 @@ meta:
 - Ensure action name in allowlist matches action entry exactly
 - Validate schema file path is correct in allowlist
 
+### Submodule not found or checkout fails
+
+**Problem**: Workflow fails with "submodule not found" or similar errors.
+
+**Solutions**:
+- Verify submodule was added correctly: `git submodule status`
+- Ensure workflow has `submodules: recursive` in checkout step
+- Try initializing submodule manually: `git submodule update --init --recursive`
+- Check `.gitmodules` file exists and has correct URL
+
 ---
 
 ## Directory Structure Reference
 
-After installation, your repository should have this structure:
+After installation with submodule, your repository should have this structure:
 
 ```text
 your-repo/
 ├── .github/
+│   ├── actions-framework/          # Git submodule (framework code)
+│   │   ├── tools/
+│   │   │   ├── parser.py           # Framework core - parses action files
+│   │   │   ├── editor.py           # Framework core - edits action files
+│   │   │   ├── validator.py        # Framework core - validates actions
+│   │   │   ├── executor.py         # Framework core - executes actions
+│   │   │   ├── pr_validator.py     # CLI tool for PR validation
+│   │   │   └── action_executor.py  # CLI tool for action execution
+│   │   └── requirements.txt        # Python dependencies for framework
 │   └── workflows/
 │       ├── pr-validation.yml       # Validates PRs with action changes
 │       └── execute-actions.yml     # Executes actions on merge to main
@@ -494,19 +566,14 @@ your-repo/
 │   ├── allowlist.yaml              # Registry of allowed action types
 │   └── YYYY-MM-DD.md               # Daily action files (created as needed)
 ├── schemas/
-│   └── your-action.json            # JSON schemas for action validation
+│   └── your-action.json            # JSON schemas for your custom actions
 ├── scripts/
-│   └── your-action.py              # Action implementation scripts
-├── tools/
-│   ├── parser.py                   # Framework core - parses action files
-│   ├── editor.py                   # Framework core - edits action files
-│   ├── validator.py                # Framework core - validates actions
-│   ├── executor.py                 # Framework core - executes actions
-│   ├── pr_validator.py             # CLI tool for PR validation
-│   └── action_executor.py          # CLI tool for action execution
-├── requirements.txt                # Python dependencies
+│   └── your-action.py              # Your custom action scripts
+├── .gitmodules                     # Git submodule configuration
 └── README.md                       # Your repository documentation
 ```
+
+**Note**: The `tools/` directory and `requirements.txt` are in the submodule, not your main repository.
 
 ---
 
@@ -517,6 +584,7 @@ your-repo/
 3. **Configure additional secrets** for your action scripts
 4. **Customize workflows** if you need different behavior
 5. **Review past actions** by browsing the `actions/` directory
+6. **Update the framework** periodically by updating the submodule to get new features and fixes
 
 ---
 
