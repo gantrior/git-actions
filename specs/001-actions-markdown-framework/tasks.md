@@ -118,11 +118,11 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T042 [P] [US3] Add immutability check in tools/validator.py (reject PRs that modify checked actions in PR mode)
-- [ ] T043 [US3] Create test fixtures in tests/fixtures/sample-modify-checked.md (PR attempting to modify checked action)
-- [ ] T044 [US3] Add immutability validation test in tests/unit/test_validator.py (verify checked action modification rejected)
-- [ ] T045 [US3] Create README.md in repository root with overview of framework and link to quickstart.md
-- [ ] T046 [US3] Copy quickstart.md from specs/ to repository root docs/ directory for user visibility
+- [x] T042 [P] [US3] Add immutability check in tools/validator.py (reject PRs that modify checked actions in PR mode)
+- [x] T043 [US3] Create test fixtures in tests/fixtures/sample-modify-checked.md (PR attempting to modify checked action)
+- [x] T044 [US3] Add immutability validation test in tests/unit/test_validator.py (verify checked action modification rejected)
+- [x] T045 [US3] Create README.md in repository root with overview of framework and link to quickstart.md
+- [x] T046 [US3] Copy quickstart.md from specs/ to repository root docs/ directory for user visibility
 
 **Checkpoint**: User Story 3 complete - human review process is safe with immutability enforcement
 
@@ -136,9 +136,9 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 4
 
-- [ ] T047 [P] [US4] Create second example action schema in schemas/confluence-comment.json (pageId + comment fields)
-- [ ] T048 [P] [US4] Create second example action script in scripts/confluence-comment.py (demonstrates extensibility)
-- [ ] T049 [US4] Add confluence-comment entry to actions/allowlist.yaml
+- [x] T047 [P] [US4] Create second example action schema in schemas/confluence-comment.json (pageId + comment fields)
+- [x] T048 [P] [US4] Create second example action script in scripts/confluence-comment.py (demonstrates extensibility)
+- [x] T049 [US4] Add confluence-comment entry to actions/allowlist.yaml
 - [ ] T050 [US4] Create developer guide in docs/adding-actions.md (how to add new action types per quickstart section)
 - [ ] T051 [US4] Create example showing two different action types in same daily file in tests/fixtures/sample-multi-action.md
 - [ ] T052 [US4] Test adding and executing new action type end-to-end
