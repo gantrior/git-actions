@@ -97,14 +97,14 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T034 [P] [US2] Create executor CLI in tools/executor.py (--file, --commit, --allowlist arguments)
-- [ ] T035 [US2] Add git configuration to executor (set user.name and user.email for automation commits)
-- [ ] T036 [US2] Implement environment detection in tools/executor.py (CI vs local via CI env var)
-- [ ] T037 [US2] Implement environment constraint checking in execute_actions_from_file() (skip actions with mismatched environment)
-- [ ] T038 [US2] Create .github/workflows/execute-actions.yml (triggers on push to main for actions/*.md, has concurrency group, includes secrets)
-- [ ] T039 [US2] Add workflow run ID capture in tools/executor.py (from GITHUB_RUN_ID environment variable)
-- [ ] T040 [US2] Create test fixtures in tests/fixtures/sample-day-complete.md (expected output after execution)
-- [ ] T041 [US2] Test execution workflow end-to-end (merge actions to main, verify execution, check committed results)
+- [x] T034 [P] [US2] Create executor CLI in tools/executor.py (--file, --commit, --allowlist arguments)
+- [x] T035 [US2] Add git configuration to executor (set user.name and user.email for automation commits)
+- [x] T036 [US2] Implement environment detection in tools/executor.py (CI vs local via CI env var)
+- [x] T037 [US2] Implement environment constraint checking in execute_actions_from_file() (skip actions with mismatched environment)
+- [x] T038 [US2] Create .github/workflows/execute-actions.yml (triggers on push to main for actions/*.md, has concurrency group, includes secrets)
+- [x] T039 [US2] Add workflow run ID capture in tools/executor.py (from GITHUB_RUN_ID environment variable)
+- [x] T040 [US2] Create test fixtures in tests/fixtures/sample-day-complete.md (expected output after execution)
+- [x] T041 [US2] Test execution workflow end-to-end (merge actions to main, verify execution, check committed results)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - full proposal → validation → merge → execution → commit flow
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Jira comment action script.
+"""Confluence comment action script.
 
-This script posts a comment to a Jira ticket.
-Input: JSON with ticket ID and comment text
+This script posts a comment to a Confluence page.
+Input: JSON with page ID and comment text
 Output: JSON with comment URL and ID
 """
 
@@ -17,33 +17,25 @@ def main():
         
         # Extract inputs
         inputs = input_data.get("inputs", {})
-        ticket = inputs.get("ticket")
+        page_id = inputs.get("pageId")
         comment = inputs.get("comment")
         
         # Validate required inputs
-        if not ticket or not comment:
+        if not page_id or not comment:
             return {
                 "status": "error",
                 "outputs": {},
-                "error": "Missing required inputs: ticket and comment"
+                "error": "Missing required inputs: pageId and comment"
             }
         
-        # In a real implementation, this would call the Jira API
+        # In a real implementation, this would call the Confluence API
         # For now, we'll simulate a successful comment post
         
-        # Check for API credentials (should be in environment)
-        jira_url = os.environ.get("JIRA_URL", "https://jira.example.com")
-        jira_token = os.environ.get("JIRA_API_TOKEN")
-        
-        # Note: In a real implementation, this would require JIRA_API_TOKEN
-        # For testing/demo purposes, we allow it to run without credentials
-        if not jira_token:
-            # Simulate successful execution without actual API call
-            pass
+        confluence_url = os.environ.get("CONFLUENCE_URL", "https://confluence.example.com")
         
         # Simulate successful API call
-        comment_id = "12345"
-        comment_url = f"{jira_url}/browse/{ticket}#comment-{comment_id}"
+        comment_id = "98765"
+        comment_url = f"{confluence_url}/pages/viewpage.action?pageId={page_id}#comment-{comment_id}"
         
         # Return success result
         output = {
