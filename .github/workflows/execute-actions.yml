@@ -41,6 +41,7 @@ jobs:
           pip install -r requirements.txt
       
       - name: Execute actions
+        id: execution
         env:
           CI: "true"
           GITHUB_RUN_ID: ${{ github.run_id }}
@@ -53,7 +54,7 @@ jobs:
       - name: Execution summary
         if: always()
         run: |
-          if [ $? -eq 0 ]; then
+          if [ "${{ steps.execution.outcome }}" == "success" ]; then
             echo "✅ All actions executed successfully"
           else
             echo "❌ Some actions failed - see logs above"

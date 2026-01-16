@@ -30,13 +30,14 @@ jobs:
           pip install -r requirements.txt
       
       - name: Validate action files
+        id: validation
         run: |
           PYTHONPATH=. python tools/pr_validator.py --file "actions/*.md"
       
       - name: Validation summary
         if: always()
         run: |
-          if [ $? -eq 0 ]; then
+          if [ "${{ steps.validation.outcome }}" == "success" ]; then
             echo "✅ All action files are valid"
           else
             echo "❌ Validation failed - see errors above"

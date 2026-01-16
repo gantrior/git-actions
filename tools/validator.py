@@ -346,10 +346,11 @@ def validate_daily_file(
             )
         
         # Validate inputs against schema
-        schema_path = os.path.join(schemas_dir, os.path.basename(entry.schema))
+        # Try schema path as-is first (relative from project root)
+        schema_path = entry.schema
         if not os.path.exists(schema_path):
-            # Try the schema path as-is if it's not in schemas_dir
-            schema_path = entry.schema
+            # Fallback: try in schemas_dir if it's just a filename
+            schema_path = os.path.join(schemas_dir, os.path.basename(entry.schema))
         
         try:
             input_errors = validate_inputs(action.inputs, schema_path)

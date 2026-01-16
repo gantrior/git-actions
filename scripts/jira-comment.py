@@ -22,11 +22,13 @@ def main():
         
         # Validate required inputs
         if not ticket or not comment:
-            return {
+            output = {
                 "status": "error",
                 "outputs": {},
                 "error": "Missing required inputs: ticket and comment"
             }
+            json.dump(output, sys.stdout)
+            return 1
         
         # In a real implementation, this would call the Jira API
         # For now, we'll simulate a successful comment post

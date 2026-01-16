@@ -351,16 +351,19 @@ def execute_actions_from_file(
         else:
             report.failed_actions += 1
         
-        # Update action entry in file
+        # Update action with outputs and meta
+        meta = {
+            "executedAt": executed_at,
+            "runId": run_id
+        }
+        if result.error:
+            meta["error"] = result.error
+        
         update = ActionUpdate(
             action_id=action.id,
             check_box=True,
             outputs=result.outputs,
-            meta={
-                "executedAt": executed_at,
-                "runId": run_id,
-                **({"error": result.error} if result.error else {})
-            }
+            meta=meta
         )
         
         # Re-read file content (in case it was modified)
