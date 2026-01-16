@@ -57,12 +57,12 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 - [x] T017 Implement validate_inputs() function in tools/validator.py (JSON schema validation)
 - [x] T018 Implement validate_daily_file() function in tools/validator.py (full validation per validator-contract.md)
 - [x] T019 Create unit tests in tests/unit/test_validator.py for validation functions
-- [ ] T020 [P] Implement ExecutionReport and ActionResult classes in tools/executor.py
-- [ ] T021 Implement execute_action_script() function in tools/executor.py (subprocess stdin/stdout per executor-contract.md)
-- [ ] T022 Implement commit_action_result() function in tools/executor.py (git auto-commit with [skip ci])
-- [ ] T023 Implement execute_actions_from_file() function in tools/executor.py (main execution loop)
-- [ ] T024 Create mock action script in tests/fixtures/mock-success.py for testing
-- [ ] T025 Create integration tests in tests/integration/test_executor.py for execution workflow
+- [x] T020 [P] Implement ExecutionReport and ActionResult classes in tools/executor.py
+- [x] T021 Implement execute_action_script() function in tools/executor.py (subprocess stdin/stdout per executor-contract.md)
+- [x] T022 Implement commit_action_result() function in tools/executor.py (git auto-commit with [skip ci])
+- [x] T023 Implement execute_actions_from_file() function in tools/executor.py (main execution loop)
+- [x] T024 Create mock action script in tests/fixtures/mock-success.py for testing
+- [x] T025 Create integration tests in tests/integration/test_executor.py for execution workflow
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
