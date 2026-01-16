@@ -72,7 +72,23 @@ A developer wants to add support for a new action type (e.g., Confluence comment
 
 ---
 
-### User Story 5 - Audit Action History (Priority: P3)
+### User Story 5 - Environment-Specific Actions (Priority: P3)
+
+A user wants to define actions that can only run in specific environments. For example, some actions require local desktop access (e.g., opening a browser for manual testing) and cannot run in CI, while others should only run in automated CI workflows. The framework supports environment constraints in the allowlist, and the execution workflow automatically skips actions with incompatible environments.
+
+**Why this priority**: Environment constraints add flexibility for mixed workflows, but the core framework can function with all actions running in all environments initially.
+
+**Independent Test**: Can be tested by creating a "local-only" action, running the CI execution workflow, and verifying it skips the action with appropriate metadata.
+
+**Acceptance Scenarios**:
+
+1. **Given** an action marked as "local-only" in the allowlist, **When** CI execution workflow runs, **Then** the action is skipped and marked with environment mismatch status
+2. **Given** an action marked as "ci-only" in the allowlist, **When** executed locally, **Then** the action is skipped with appropriate indication
+3. **Given** an action marked as "any", **When** executed in any environment, **Then** the action runs normally
+
+---
+
+### User Story 6 - Audit Action History (Priority: P3)
 
 A user wants to review what actions have been executed. They browse the daily markdown files in the `actions/` directory, where each file serves as an append-only audit log showing when actions were proposed, when they executed, and their results.
 
@@ -89,14 +105,14 @@ A user wants to review what actions have been executed. They browse the daily ma
 
 ### Edge Cases
 
-- What happens when an action entry is malformed during parsing? (System should fail PR validation with specific line/column error)
-- What happens when two PRs concurrently add actions to the same daily file? (Git merge conflict requires manual resolution)
-- What happens when an action script times out or hangs? (Action runner should enforce timeout and record error)
-- What happens when a daily file is manually edited while the execution workflow is running? (Concurrency lock should prevent simultaneous execution runs)
-- What happens when an action outputs extremely large data (e.g., 10MB JSON)? (Output should be truncated with a warning)
-- What happens when a user tries to modify a checked action in a PR? (Validation should reject as immutable)
-- What happens when the repository has no `actions/` directory yet? (First action creates the directory automatically)
-- What happens when an action script is deleted but old daily files reference it? (Execution should fail with clear "action not found" error)
+- What happens when an action entry is malformed during parsing? (Parser fails with specific line/column error and process halts - no continuation)
+- What happens when two PRs concurrently add actions to the same daily file? (Git merge conflict requires manual resolution; markdown format is human-readable to facilitate manual editing)
+- What happens when an action script times out or hangs? (CLI fails with timeout error and does not continue processing)
+- What happens when a daily file is manually edited while the execution workflow is running? (Execution commits each action result immediately after completion; if conflict occurs or action disappears, append execution indication at top of file)
+- What happens when an action outputs extremely large data (e.g., 1MB+ JSON)? (Output is truncated at 1MB limit with warning message appended)
+- What happens when a user tries to modify a checked action in a PR? (PR validation should reject as immutable; if modification reaches main anyway, action will be re-executed)
+- What happens when the repository has no `actions/` directory yet? (Directory is auto-created when needed on first action)
+- What happens when an action script is deleted but old daily files reference it? (Execution fails with clear "action not found" error and does not continue)
 
 ## Requirements *(mandatory)*
 
@@ -145,10 +161,13 @@ A user wants to review what actions have been executed. They browse the daily ma
 - **FR-024**: Action scripts MUST log diagnostics to stderr (not included in result)
 - **FR-025**: Action scripts MUST exit with code 0 for success, non-zero for error
 - **FR-026**: Action allowlist MUST be defined in `actions/allowlist.yaml` mapping action names to script paths
-- **FR-027**: Allowlist entry format MUST be: `action-name: {script: "path/to/script.py", version: "1.0", schema: "path/to/schema.json"}`
+- **FR-027**: Allowlist entry format MUST be: `action-name: {script: "path/to/script.py", version: "1.0", schema: "path/to/schema.json", timeout: 60, environment: "any|ci-only|local-only"}`
 - **FR-028**: Version compatibility MUST be checked: action request version must match allowlist version
 - **FR-029**: Action scripts MUST have execute permission
 - **FR-030**: Action runner MUST enforce timeout (default 300 seconds, configurable per action in allowlist)
+- **FR-030a**: Actions MAY specify environment constraints (e.g., "ci-only", "local-only", "any") in the allowlist
+- **FR-030b**: Execution workflow MUST skip actions with incompatible environment constraints (e.g., skip "local-only" actions in CI)
+- **FR-030c**: Skipped actions MUST be marked with a special status in meta field indicating environment mismatch
 
 #### D) Validation and Execution Pipelines
 
@@ -173,9 +192,12 @@ A user wants to review what actions have been executed. They browse the daily ma
 - **FR-044**: Execution MUST execute unchecked actions sequentially (not in parallel)
 - **FR-045**: For each action execution, system MUST invoke the mapped script with inputs
 - **FR-046**: After successful execution, system MUST update action entry: check checkbox, populate outputs, add meta (executedAt, runId)
+- **FR-046a**: System MUST commit each action result immediately after execution (not wait for all actions to complete)
+- **FR-046b**: If commit conflict occurs or action entry disappears from file, system MUST append execution result at top of file as new entry
 - **FR-047**: After failed execution, system MUST update action entry: check checkbox, add meta with error message
-- **FR-048**: After all actions in a file are processed, system MUST commit changes with message: "Execute actions from YYYY-MM-DD"
+- **FR-048**: After all actions in a file are processed, system MUST commit changes with message: "Execute actions from YYYY-MM-DD" (if not already committed individually)
 - **FR-049**: Execution MUST skip already-checked actions (idempotent execution)
+- **FR-049a**: Execution MUST skip actions with incompatible environment constraints (e.g., skip "local-only" when running in CI)
 - **FR-050**: Execution workflow MUST have access to production secrets (e.g., JIRA_TOKEN)
 - **FR-051**: Execution MUST use concurrency lock to prevent multiple simultaneous runs on same files
 - **FR-052**: Execution MUST handle partial failure (some actions succeed, some fail) by processing all actions regardless
@@ -269,7 +291,7 @@ The following assumptions were made to fill gaps in the feature description:
 - **ASM-003**: Actions execute sequentially (not in parallel) to maintain simplicity and avoid complex state management
 - **ASM-004**: Action scripts can be written in any language as long as they accept JSON on stdin and output JSON on stdout
 - **ASM-005**: Default action timeout is 300 seconds (5 minutes) but configurable per action type
-- **ASM-006**: Maximum output size per action is 10KB; larger outputs are truncated with warning
+- **ASM-006**: Maximum output size per action is 1MB; larger outputs are truncated with warning
 - **ASM-007**: Daily files are created on-demand when first action is added (no pre-creation needed)
 - **ASM-008**: Action IDs only need to be unique within a single daily file (not globally unique)
 - **ASM-009**: Concurrency control uses GitHub Actions' built-in concurrency groups (no external locking service)
@@ -384,18 +406,28 @@ jira-comment:
   version: "1.0"
   schema: "schemas/jira-comment.json"
   timeout: 60
+  environment: "any"
 
 confluence-comment:
   script: "scripts/confluence-comment.py"
   version: "1.0"
   schema: "schemas/confluence-comment.json"
   timeout: 60
+  environment: "any"
 
 github-pr-review:
   script: "scripts/github-pr-review.py"
   version: "1.0"
   schema: "schemas/github-pr-review.json"
   timeout: 120
+  environment: "ci-only"
+
+local-desktop-action:
+  script: "scripts/local-desktop-action.py"
+  version: "1.0"
+  schema: "schemas/local-desktop-action.json"
+  timeout: 300
+  environment: "local-only"
 ```
 
 ### Example 4: Action Input Schema
