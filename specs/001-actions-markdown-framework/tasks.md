@@ -29,10 +29,10 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project directory structure (tools/, scripts/, schemas/, actions/, tests/fixtures/, .github/workflows/)
-- [ ] T002 Initialize Python project with requirements.txt (pyyaml, jsonschema, requests, pytest)
-- [ ] T003 [P] Create actions/allowlist.yaml with initial structure (empty action registry)
-- [ ] T004 [P] Create .gitignore to exclude __pycache__, .pytest_cache, *.pyc
+- [x] T001 Create project directory structure (tools/, scripts/, schemas/, actions/, tests/fixtures/, .github/workflows/)
+- [x] T002 Initialize Python project with requirements.txt (pyyaml, jsonschema, requests, pytest)
+- [x] T003 [P] Create actions/allowlist.yaml with initial structure (empty action registry)
+- [x] T004 [P] Create .gitignore to exclude __pycache__, .pytest_cache, *.pyc
 
 ---
 
@@ -42,15 +42,15 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Implement ActionEntry class in tools/parser.py (data structure for parsed actions)
-- [ ] T006 [P] Implement ParseError exception class in tools/parser.py with line number tracking
-- [ ] T007 Implement parse_daily_file() function in tools/parser.py (regex + state machine parser per parser-contract.md)
-- [ ] T008 [P] Create test fixtures in tests/fixtures/sample-day-pending.md (2-3 unchecked actions for testing)
-- [ ] T009 Create unit tests in tests/unit/test_parser.py for parse_daily_file() function
-- [ ] T010 [P] Implement ActionUpdate class in tools/editor.py (data structure for updates)
-- [ ] T011 [P] Implement ActionNotFoundError and InvalidUpdateError exceptions in tools/editor.py
-- [ ] T012 Implement update_action_entry() function in tools/editor.py (in-place markdown editor per editor-contract.md)
-- [ ] T013 Create unit tests in tests/unit/test_editor.py for update_action_entry() function
+- [x] T005 [P] Implement ActionEntry class in tools/parser.py (data structure for parsed actions)
+- [x] T006 [P] Implement ParseError exception class in tools/parser.py with line number tracking
+- [x] T007 Implement parse_daily_file() function in tools/parser.py (regex + state machine parser per parser-contract.md)
+- [x] T008 [P] Create test fixtures in tests/fixtures/sample-day-pending.md (2-3 unchecked actions for testing)
+- [x] T009 Create unit tests in tests/unit/test_parser.py for parse_daily_file() function
+- [x] T010 [P] Implement ActionUpdate class in tools/editor.py (data structure for updates)
+- [x] T011 [P] Implement ActionNotFoundError and InvalidUpdateError exceptions in tools/editor.py
+- [x] T012 Implement update_action_entry() function in tools/editor.py (in-place markdown editor per editor-contract.md)
+- [x] T013 Create unit tests in tests/unit/test_editor.py for update_action_entry() function
 - [ ] T014 [P] Implement Allowlist and AllowlistEntry classes in tools/validator.py
 - [ ] T015 [P] Implement ValidationResult and ValidationError classes in tools/validator.py
 - [ ] T016 Implement load_allowlist() function in tools/validator.py (parse allowlist.yaml)
