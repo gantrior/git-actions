@@ -2,7 +2,7 @@
 
 This file shows what actions look like after execution.
 
-- [x] `complete-1` — *jira-comment* v1.0
+- [x] `complete-1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -15,7 +15,7 @@ meta:
   runId: '1234567890'
 ```
 
-- [x] `complete-2` — *jira-comment* v1.0
+- [x] `complete-2` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-456

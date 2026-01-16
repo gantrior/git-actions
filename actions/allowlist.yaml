@@ -1,6 +1,9 @@
 # Action Allowlist
 # Defines all valid action types that can be used in daily action files
 #
+# This is a framework repository - actual actions should be defined in
+# repositories that use this framework, not here.
+#
 # Format:
 # action-name:
 #   script: "path/to/script.py"
@@ -8,17 +11,11 @@
 #   schema: "path/to/schema.json"
 #   timeout: 300  # seconds, default 300 (5 min), max 3600 (1 hour)
 #   environment: "any"  # any, ci-only, or local-only
-
-jira-comment:
-  script: "scripts/jira-comment.py"
-  version: "1.0"
-  schema: "schemas/jira-comment.json"
-  timeout: 60
-  environment: "any"
-
-confluence-comment:
-  script: "scripts/confluence-comment.py"
-  version: "1.0"
-  schema: "schemas/confluence-comment.json"
-  timeout: 60
-  environment: "any"
+#
+# Example:
+# jira-comment:
+#   script: "scripts/jira-comment.py"
+#   version: "1.0"
+#   schema: "schemas/jira-comment.json"
+#   timeout: 60
+#   environment: "any"

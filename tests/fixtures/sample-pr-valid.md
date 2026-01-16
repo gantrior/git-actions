@@ -2,7 +2,7 @@
 
 This file contains valid actions that should pass PR validation.
 
-- [ ] `pr-test-1` — *jira-comment* v1.0
+- [ ] `pr-test-1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -11,7 +11,7 @@ outputs: {}
 meta: {}
 ```
 
-- [ ] `pr-test-2` — *jira-comment* v1.0
+- [ ] `pr-test-2` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-456

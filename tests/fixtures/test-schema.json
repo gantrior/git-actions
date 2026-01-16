@@ -6,12 +6,12 @@
     "ticket": {
       "type": "string",
       "pattern": "^[A-Z]+-[0-9]+$",
-      "description": "Jira ticket ID (e.g., PROJ-123)"
+      "description": "Ticket ID (e.g., PROJ-123)"
     },
     "comment": {
       "type": "string",
       "minLength": 1,
-      "description": "Comment text to post"
+      "description": "Comment text"
     }
   },
   "additionalProperties": false

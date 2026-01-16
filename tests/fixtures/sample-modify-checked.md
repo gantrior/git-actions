@@ -2,7 +2,7 @@
 
 This file attempts to modify a checked action, which should fail PR validation.
 
-- [x] `modified-action` — *jira-comment* v1.0
+- [x] `modified-action` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123

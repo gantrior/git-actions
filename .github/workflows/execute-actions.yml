@@ -1,14 +1,23 @@
 name: Execute Actions
 
 # This workflow executes pending actions from daily files after PRs are merged
-# It runs on push to main branch when action files are modified
+# 
+# NOTE: This is a FRAMEWORK repository. This workflow is provided as a template
+# for repositories that use this framework. It is disabled here by using
+# workflow_dispatch (manual trigger only).
+# 
+# To use this in your repository:
+# 1. Copy this workflow to your .github/workflows/ directory
+# 2. Change the trigger from 'workflow_dispatch' to 'push' with appropriate paths
+# 3. Configure any secrets needed by your action scripts
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'actions/*.md'
+  workflow_dispatch:  # Manual trigger only - disabled for framework repo
+    inputs:
+      file_pattern:
+        description: 'File pattern to execute (e.g., actions/*.md)'
+        required: false
+        default: 'actions/*.md'
 
 # Ensure only one execution runs at a time to avoid conflicts
 concurrency:
@@ -46,10 +55,11 @@ jobs:
           CI: "true"
           GITHUB_RUN_ID: ${{ github.run_id }}
           # Add any secrets needed by action scripts here
+          # Example:
           # JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           # JIRA_URL: ${{ secrets.JIRA_URL }}
         run: |
-          PYTHONPATH=. python tools/action_executor.py --file "actions/*.md" --commit
+          PYTHONPATH=. python tools/action_executor.py --file "${{ github.event.inputs.file_pattern || 'actions/*.md' }}" --commit
       
       - name: Execution summary
         if: always()

@@ -6,12 +6,15 @@ GitOps for actions of your AI assistance
 
 > A framework for proposing and executing automated actions through reviewable pull requests
 
-[![PR Validation](https://github.com/gantrior/git-actions/workflows/PR%20Validation/badge.svg)](https://github.com/gantrior/git-actions/actions)
-[![Execute Actions](https://github.com/gantrior/git-actions/workflows/Execute%20Actions/badge.svg)](https://github.com/gantrior/git-actions/actions)
-
 ### Overview
 
 The Actions-as-Markdown Framework enables AI assistants and developers to propose automated actions (like posting Jira comments, updating documentation, triggering deployments) as reviewable PRs by editing markdown files. Actions are validated but **not executed** until the PR is merged to `main`. After execution, the system auto-commits results back inline with checked boxes and outputs, creating a complete audit trail.
+
+**This is a framework repository** - it provides the core tools and workflows. To use this framework:
+1. Set up this framework in your repository
+2. Define your own actions in `actions/allowlist.yaml`
+3. Create action scripts in `scripts/` with JSON schemas in `schemas/`
+4. Use the provided workflows for PR validation and execution
 
 **Key benefits:**
 - ✅ **Safe**: Actions are validated before execution, no surprises
@@ -21,20 +24,24 @@ The Actions-as-Markdown Framework enables AI assistants and developers to propos
 
 ### Quick Start
 
-See [docs/quickstart.md](docs/quickstart.md) for detailed usage guide.
-
-### Available Actions
-
-| Action | Description | Required Inputs | Environment |
-|--------|-------------|----------------|-------------|
-| `jira-comment` v1.0 | Post comment to Jira ticket | `ticket`, `comment` | any |
-| `confluence-comment` v1.0 | Post comment to Confluence page | `pageId`, `comment` | any |
+See [docs/quickstart.md](docs/quickstart.md) for detailed usage guide on how to:
+- Define custom actions for your use case
+- Propose actions via pull requests
+- Configure validation and execution workflows
 
 ### Documentation
 
-- **[Quickstart Guide](docs/quickstart.md)** - How to propose and execute actions
+- **[Quickstart Guide](docs/quickstart.md)** - How to use the framework
 - **[Specification](specs/001-actions-markdown-framework/spec.md)** - Complete feature spec
 - **[Implementation Plan](specs/001-actions-markdown-framework/plan.md)** - Technical design
+- **[Adding Actions](docs/adding-actions.md)** - Guide for adding new action types (coming soon)
+
+### Core Components
+
+- **Parser** (`tools/parser.py`) - Parses markdown action files
+- **Validator** (`tools/validator.py`) - Schema and allowlist validation
+- **Executor** (`tools/executor.py`) - Action execution engine
+- **Workflows** (`.github/workflows/`) - Templates for PR validation and execution
 
 ## Spec-Kit
 

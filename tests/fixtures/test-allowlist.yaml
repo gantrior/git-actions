@@ -1,0 +1,9 @@
+# Test Allowlist
+# This is used for testing the framework - not real actions
+
+test-action:
+  script: "tests/fixtures/mock-success.py"
+  version: "1.0"
+  schema: "tests/fixtures/test-schema.json"
+  timeout: 10
+  environment: "any"

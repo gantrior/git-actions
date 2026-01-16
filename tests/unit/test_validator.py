@@ -15,11 +15,10 @@ from tools.validator import (
 
 def test_load_allowlist():
     """Load allowlist from YAML file."""
-    allowlist = load_allowlist("actions/allowlist.yaml")
+    allowlist = load_allowlist("tests/fixtures/test-allowlist.yaml")
     
     assert isinstance(allowlist, Allowlist)
-    assert allowlist.is_allowed("jira-comment")
-    assert allowlist.is_allowed("confluence-comment")
+    assert allowlist.is_allowed("test-action")
     assert not allowlist.is_allowed("nonexistent-action")
 
 
@@ -31,23 +30,23 @@ def test_load_allowlist_file_not_found():
 
 def test_allowlist_entry_properties():
     """AllowlistEntry should have all required properties."""
-    allowlist = load_allowlist("actions/allowlist.yaml")
-    entry = allowlist.get_entry("jira-comment")
+    allowlist = load_allowlist("tests/fixtures/test-allowlist.yaml")
+    entry = allowlist.get_entry("test-action")
     
     assert entry is not None
-    assert entry.script == "scripts/jira-comment.py"
+    assert entry.script == "tests/fixtures/mock-success.py"
     assert entry.version == "1.0"
-    assert entry.schema == "schemas/jira-comment.json"
-    assert entry.timeout == 60
+    assert entry.schema == "tests/fixtures/test-schema.json"
+    assert entry.timeout == 10
     assert entry.environment == "any"
 
 
 def test_allowlist_validate_version():
     """Should validate version matches allowlist."""
-    allowlist = load_allowlist("actions/allowlist.yaml")
+    allowlist = load_allowlist("tests/fixtures/test-allowlist.yaml")
     
-    assert allowlist.validate_version("jira-comment", "1.0") is True
-    assert allowlist.validate_version("jira-comment", "2.0") is False
+    assert allowlist.validate_version("test-action", "1.0") is True
+    assert allowlist.validate_version("test-action", "2.0") is False
     assert allowlist.validate_version("nonexistent", "1.0") is False
 
 
@@ -91,7 +90,7 @@ def test_validate_inputs_valid():
         "ticket": "PROJ-123",
         "comment": "Test comment"
     }
-    errors = validate_inputs(inputs, "schemas/jira-comment.json")
+    errors = validate_inputs(inputs, "tests/fixtures/test-schema.json")
     assert errors == []
 
 
@@ -101,7 +100,7 @@ def test_validate_inputs_missing_required_field():
         "comment": "Test comment"
         # Missing "ticket" field
     }
-    errors = validate_inputs(inputs, "schemas/jira-comment.json")
+    errors = validate_inputs(inputs, "tests/fixtures/test-schema.json")
     assert len(errors) > 0
     assert "ticket" in errors[0] or "'ticket' is a required property" in errors[0]
 
@@ -112,7 +111,7 @@ def test_validate_inputs_invalid_pattern():
         "ticket": "invalid-format",  # Should be PROJ-123 format
         "comment": "Test comment"
     }
-    errors = validate_inputs(inputs, "schemas/jira-comment.json")
+    errors = validate_inputs(inputs, "tests/fixtures/test-schema.json")
     assert len(errors) > 0
 
 
@@ -123,7 +122,7 @@ def test_validate_inputs_additional_properties():
         "comment": "Test comment",
         "extra_field": "not allowed"
     }
-    errors = validate_inputs(inputs, "schemas/jira-comment.json")
+    errors = validate_inputs(inputs, "tests/fixtures/test-schema.json")
     assert len(errors) > 0
     assert "additional" in errors[0].lower() or "extra_field" in errors[0]
 
@@ -139,11 +138,13 @@ def test_validate_daily_file_valid():
     """Should validate a valid daily file."""
     result = validate_daily_file(
         file_path="tests/fixtures/sample-day-pending.md",
-        allowlist_path="actions/allowlist.yaml",
-        schemas_dir="schemas/",
+        allowlist_path="tests/fixtures/test-allowlist.yaml",
+        schemas_dir="tests/fixtures/",
         mode="pr"
     )
     
+    assert result.is_valid is True
+    assert len(result.errors) == 0
     assert result.is_valid is True
     assert len(result.errors) == 0
 
@@ -166,8 +167,8 @@ meta: {}
     try:
         result = validate_daily_file(
             file_path=temp_file,
-            allowlist_path="actions/allowlist.yaml",
-            schemas_dir="schemas/",
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
             mode="pr"
         )
         
@@ -181,7 +182,7 @@ meta: {}
 
 def test_validate_daily_file_version_mismatch():
     """Should detect version mismatch."""
-    content = """- [ ] `a1` — *jira-comment* v2.0
+    content = """- [ ] `a1` — *test-action* v2.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -197,8 +198,8 @@ meta: {}
     try:
         result = validate_daily_file(
             file_path=temp_file,
-            allowlist_path="actions/allowlist.yaml",
-            schemas_dir="schemas/",
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
             mode="pr"
         )
         
@@ -210,7 +211,7 @@ meta: {}
 
 def test_validate_daily_file_schema_validation_fails():
     """Should detect schema validation errors."""
-    content = """- [ ] `a1` — *jira-comment* v1.0
+    content = """- [ ] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: "invalid"
@@ -226,8 +227,8 @@ meta: {}
     try:
         result = validate_daily_file(
             file_path=temp_file,
-            allowlist_path="actions/allowlist.yaml",
-            schemas_dir="schemas/",
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
             mode="pr"
         )
         
@@ -239,7 +240,7 @@ meta: {}
 
 def test_validate_daily_file_checked_action_in_pr_mode():
     """Should reject checked actions in PR mode (immutability)."""
-    content = """- [x] `a1` — *jira-comment* v1.0
+    content = """- [x] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -257,8 +258,8 @@ meta:
     try:
         result = validate_daily_file(
             file_path=temp_file,
-            allowlist_path="actions/allowlist.yaml",
-            schemas_dir="schemas/",
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
             mode="pr"
         )
         
@@ -270,7 +271,7 @@ meta:
 
 def test_validate_daily_file_checked_action_in_execution_mode():
     """Should allow checked actions in execution mode."""
-    content = """- [x] `a1` — *jira-comment* v1.0
+    content = """- [x] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -288,8 +289,8 @@ meta:
     try:
         result = validate_daily_file(
             file_path=temp_file,
-            allowlist_path="actions/allowlist.yaml",
-            schemas_dir="schemas/",
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
             mode="execution"
         )
         
@@ -309,7 +310,7 @@ outputs: {}
 meta: {}
 ```
 
-- [ ] `a2` — *jira-comment* v2.0
+- [ ] `a2` — *test-action* v2.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -325,8 +326,8 @@ meta: {}
     try:
         result = validate_daily_file(
             file_path=temp_file,
-            allowlist_path="actions/allowlist.yaml",
-            schemas_dir="schemas/",
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
             mode="pr"
         )
         

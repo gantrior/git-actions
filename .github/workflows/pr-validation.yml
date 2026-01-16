@@ -1,8 +1,15 @@
 name: PR Validation
 
 # This workflow validates action files in pull requests
-# It runs on every PR to main and validates the format and schema
-# of all action files without executing them
+# 
+# NOTE: This is a FRAMEWORK repository. This workflow is provided as a template
+# for repositories that use this framework. It will only run if action files
+# are present in the actions/ directory.
+# 
+# To use this in your repository:
+# 1. Copy this workflow to your .github/workflows/ directory
+# 2. Ensure your actions/ directory contains daily action files (*.md)
+# 3. The workflow will automatically validate PRs that modify action files
 
 on:
   pull_request:

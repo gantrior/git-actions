@@ -14,7 +14,7 @@ meta: {}
 
 ## Invalid: Version mismatch
 
-- [ ] `invalid-2` — *jira-comment* v2.0
+- [ ] `invalid-2` — *test-action* v2.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -25,7 +25,7 @@ meta: {}
 
 ## Invalid: Schema violation (missing required field)
 
-- [ ] `invalid-3` — *jira-comment* v1.0
+- [ ] `invalid-3` — *test-action* v1.0
 ```yaml
 inputs:
   comment: "Missing ticket field"
@@ -35,7 +35,7 @@ meta: {}
 
 ## Invalid: Schema violation (pattern mismatch)
 
-- [ ] `invalid-4` — *jira-comment* v1.0
+- [ ] `invalid-4` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: "not-a-valid-pattern"
@@ -46,7 +46,7 @@ meta: {}
 
 ## Invalid: Checked action (immutability violation)
 
-- [x] `invalid-5` — *jira-comment* v1.0
+- [x] `invalid-5` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-999

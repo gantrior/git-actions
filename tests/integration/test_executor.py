@@ -98,7 +98,7 @@ def test_execute_actions_from_file():
         "test-action": {
             "script": "tests/fixtures/mock-success.py",
             "version": "1.0",
-            "schema": "schemas/jira-comment.json",  # Reuse existing schema
+            "schema": "tests/fixtures/test-schema.json",
             "timeout": 10,
             "environment": "any"
         }
@@ -159,7 +159,7 @@ def test_execute_actions_from_file_with_failure():
         "test-action": {
             "script": "tests/fixtures/mock-failure.py",
             "version": "1.0",
-            "schema": "schemas/jira-comment.json",
+            "schema": "tests/fixtures/test-schema.json",
             "timeout": 10,
             "environment": "any"
         }
@@ -212,7 +212,7 @@ def test_execute_actions_skips_checked_actions():
         "test-action": {
             "script": "tests/fixtures/mock-success.py",
             "version": "1.0",
-            "schema": "schemas/jira-comment.json",
+            "schema": "tests/fixtures/test-schema.json",
             "timeout": 10,
             "environment": "any"
         }

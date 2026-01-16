@@ -2,7 +2,7 @@
 
 ## Actions for 2026-01-15
 
-- [ ] `a1` — *jira-comment* v1.0
+- [ ] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -11,7 +11,7 @@ outputs: {}
 meta: {}
 ```
 
-- [ ] `a2` — *jira-comment* v1.0
+- [ ] `a2` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-124
@@ -22,10 +22,10 @@ outputs: {}
 meta: {}
 ```
 
-- [ ] `a3` — *confluence-comment* v1.0
+- [ ] `a3` — *test-action* v1.0
 ```yaml
 inputs:
-  pageId: "789012"
+  ticket: TEST-789
   comment: "Added deployment instructions"
 outputs: {}
 meta: {}

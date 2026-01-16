@@ -23,7 +23,7 @@ Nothing to do today!
 
 def test_parse_single_pending_action():
     """Parse a single unchecked action."""
-    content = """- [ ] `a1` — *jira-comment* v1.0
+    content = """- [ ] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -37,7 +37,7 @@ meta: {}
     
     action = actions[0]
     assert action.id == "a1"
-    assert action.name == "jira-comment"
+    assert action.name == "test-action"
     assert action.version == "1.0"
     assert action.is_checked is False
     assert action.inputs == {"ticket": "PROJ-123", "comment": "Test comment"}
@@ -48,7 +48,7 @@ meta: {}
 
 def test_parse_checked_action():
     """Parse a completed action with outputs and meta."""
-    content = """- [x] `a1` — *jira-comment* v1.0
+    content = """- [x] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -86,7 +86,7 @@ def test_parse_multiple_actions():
     
     # Check first action
     assert actions[0].id == "a1"
-    assert actions[0].name == "jira-comment"
+    assert actions[0].name == "test-action"
     assert actions[0].inputs["ticket"] == "PROJ-123"
     
     # Check second action (multiline comment)
@@ -96,12 +96,12 @@ def test_parse_multiple_actions():
     
     # Check third action (different action type)
     assert actions[2].id == "a3"
-    assert actions[2].name == "confluence-comment"
+    assert actions[2].name == "test-action"
 
 
 def test_parse_uppercase_x_in_checkbox():
     """Uppercase X in checkbox should be treated as checked."""
-    content = """- [X] `a1` — *jira-comment* v1.0
+    content = """- [X] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -116,7 +116,7 @@ meta: {}
 
 def test_parse_action_id_with_hyphens():
     """Action IDs can contain hyphens."""
-    content = """- [ ] `jira-update-001` — *jira-comment* v1.0
+    content = """- [ ] `jira-update-001` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -131,7 +131,7 @@ meta: {}
 
 def test_parse_error_missing_yaml_fence():
     """Should raise ParseError if YAML fence is missing."""
-    content = """- [ ] `a1` — *jira-comment* v1.0
+    content = """- [ ] `a1` — *test-action* v1.0
 inputs:
   ticket: PROJ-123
 """
@@ -145,7 +145,7 @@ inputs:
 
 def test_parse_error_unclosed_yaml_fence():
     """Should raise ParseError if YAML fence is not closed."""
-    content = """- [ ] `a1` — *jira-comment* v1.0
+    content = """- [ ] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -159,7 +159,7 @@ inputs:
 
 def test_parse_error_invalid_yaml():
     """Should raise ParseError for invalid YAML syntax."""
-    content = """- [ ] `a1` — *jira-comment* v1.0
+    content = """- [ ] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -176,7 +176,7 @@ inputs:
 
 def test_parse_error_yaml_not_dict():
     """Should raise ParseError if YAML is not a dictionary."""
-    content = """- [ ] `a1` — *jira-comment* v1.0
+    content = """- [ ] `a1` — *test-action* v1.0
 ```yaml
 - list item 1
 - list item 2
@@ -190,7 +190,7 @@ def test_parse_error_yaml_not_dict():
 
 def test_parse_error_inputs_not_dict():
     """Should raise ParseError if inputs is not a dictionary."""
-    content = """- [ ] `a1` — *jira-comment* v1.0
+    content = """- [ ] `a1` — *test-action* v1.0
 ```yaml
 inputs: "not a dict"
 outputs: {}
@@ -209,7 +209,7 @@ def test_parse_with_free_text_mixed():
 
 Some introduction text here.
 
-- [ ] `a1` — *jira-comment* v1.0
+- [ ] `a1` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-123
@@ -219,7 +219,7 @@ meta: {}
 
 More text in between.
 
-- [ ] `a2` — *jira-comment* v1.0
+- [ ] `a2` — *test-action* v1.0
 ```yaml
 inputs:
   ticket: PROJ-124
