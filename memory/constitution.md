@@ -1,50 +1,147 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# git-actions Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Self-Documenting Code (NON-NEGOTIABLE)
+Code MUST communicate intent through structure and naming rather than comments.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+- Functions, types, and variables MUST be named to express domain intent.
+- Inline comments MUST NOT describe *what* the code does.
+- Inline comments MAY exist only to explain:
+  - WHY a decision was made
+  - Tradeoffs or constraints
+  - External limitations (protocol, spec, vendor, performance)
+- If code requires explanatory comments, it MUST be refactored until it becomes readable without them.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+> Rule of thumb: If a comment can be derived by reading the code, it is forbidden.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+---
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Small Functions by Construction (NON-NEGOTIABLE)
+Functions MUST be small to enforce readability and composability.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+- Target function size: **≤ 15 non-empty lines**
+- Absolute maximum: **25 lines**, allowed only with an explicit WHY comment
+- Each function MUST have a single, clear responsibility.
+- Nesting depth SHOULD NOT exceed 2 levels.
+- Guard clauses and early returns are preferred over nested conditionals.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+Large functions indicate missing abstractions and MUST be decomposed.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+---
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Decomposition over Explanation
+Complexity MUST be addressed through decomposition, not documentation.
+
+- Any logical block with a clear purpose SHOULD be extracted into a well-named function.
+- Orchestrator functions MAY exist but MUST consist only of:
+  - validation calls
+  - transformations
+  - coordination of domain steps
+- Helper functions MUST encode intent through naming rather than comments.
+
+> The correct response to complexity is more functions, not more comments.
+
+---
+
+### IV. Why-Only Comments Rule
+Comments are a design artifact, not a teaching aid.
+
+Allowed comment categories:
+- **WHY** – rationale, tradeoff, constraint
+- **REFERENCE** – spec, ADR, KIP, bug, or external contract
+- **WARNING** – invariants, performance, security, or footguns
+
+Disallowed:
+- Line-by-line narration
+- Restating code behavior
+- Explaining syntax or control flow
+
+Example (acceptable):
+```
+// WHY: retry here avoids partial state divergence between cache and source of truth.
+// Ref: SPEC-KIP §Error Handling, ADR-0042
+```
+
+---
+
+### V. Naming Is Architecture
+Naming decisions define system readability and MUST be treated as architectural choices.
+
+- Names MUST reflect domain language defined in the spec.
+- Generic names (`data`, `handler`, `process`, `value`) are forbidden outside trivial scopes.
+- Boolean values MUST use intent-revealing prefixes (`is`, `has`, `should`, `can`).
+- Function names MUST describe observable behavior, not implementation.
+
+Poor naming is considered a correctness issue.
+
+---
+
+### VI. Spec-First, Test-First Development (NON-NEGOTIABLE)
+Behavior MUST be defined before implementation.
+
+- Every feature starts with a SPEC-KIP.
+- Tests MUST be written before implementation.
+- Tests MUST encode acceptance criteria and observable behavior.
+- Implementation MUST only satisfy the written spec and tests—nothing more.
+
+Refactoring is allowed only when tests remain unchanged.
+
+---
+
+### VII. Simplicity and Explicitness
+The system MUST remain understandable by a reader unfamiliar with its history.
+
+- Prefer explicit code over clever abstractions.
+- YAGNI applies at all levels.
+- No speculative generalization without a documented reason.
+- Hidden side effects are forbidden.
+
+If behavior is surprising, it is wrong.
+
+---
+
+## Quality Constraints
+
+### Function & Complexity Limits
+- Max function size enforced in review and tooling where possible.
+- Cyclomatic complexity SHOULD remain minimal and justified when exceeded.
+
+### Error Handling
+- Fail fast at boundaries.
+- Errors MUST describe violated invariants.
+- Caught errors MUST be either fully handled or rethrown with context.
+- Silent failure is forbidden.
+
+### Types and Invariants
+- Invariants SHOULD be enforced via types and validation functions.
+- Comments MUST NOT be used to compensate for weak typing.
+
+---
+
+## Development Workflow
+
+1. Write or update SPEC-KIP
+2. Define acceptance criteria
+3. Write failing tests
+4. Implement with small, composable functions
+5. Refactor for readability
+6. Review against Constitution checklist
+
+### Review Checklist (Mandatory)
+- [ ] Functions ≤ 15 lines or explicitly justified
+- [ ] No "what" comments present
+- [ ] Names reflect domain intent
+- [ ] Complexity handled via decomposition
+- [ ] Tests match spec and acceptance criteria
+- [ ] No undocumented exceptions to rules
+
+---
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This Constitution supersedes all other practices. Amendments require documentation, approval, and migration plan.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+All PRs and reviews must verify compliance. Complexity must be justified.
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-16 | **Last Amended**: 2026-01-16
