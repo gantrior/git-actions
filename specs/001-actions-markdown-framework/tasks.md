@@ -29,10 +29,10 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project directory structure (tools/, scripts/, schemas/, actions/, tests/fixtures/, .github/workflows/)
-- [ ] T002 Initialize Python project with requirements.txt (pyyaml, jsonschema, requests, pytest)
-- [ ] T003 [P] Create actions/allowlist.yaml with initial structure (empty action registry)
-- [ ] T004 [P] Create .gitignore to exclude __pycache__, .pytest_cache, *.pyc
+- [x] T001 Create project directory structure (tools/, scripts/, schemas/, actions/, tests/fixtures/, .github/workflows/)
+- [x] T002 Initialize Python project with requirements.txt (pyyaml, jsonschema, requests, pytest)
+- [x] T003 [P] Create actions/allowlist.yaml with initial structure (empty action registry)
+- [x] T004 [P] Create .gitignore to exclude __pycache__, .pytest_cache, *.pyc
 
 ---
 
@@ -42,27 +42,27 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Implement ActionEntry class in tools/parser.py (data structure for parsed actions)
-- [ ] T006 [P] Implement ParseError exception class in tools/parser.py with line number tracking
-- [ ] T007 Implement parse_daily_file() function in tools/parser.py (regex + state machine parser per parser-contract.md)
-- [ ] T008 [P] Create test fixtures in tests/fixtures/sample-day-pending.md (2-3 unchecked actions for testing)
-- [ ] T009 Create unit tests in tests/unit/test_parser.py for parse_daily_file() function
-- [ ] T010 [P] Implement ActionUpdate class in tools/editor.py (data structure for updates)
-- [ ] T011 [P] Implement ActionNotFoundError and InvalidUpdateError exceptions in tools/editor.py
-- [ ] T012 Implement update_action_entry() function in tools/editor.py (in-place markdown editor per editor-contract.md)
-- [ ] T013 Create unit tests in tests/unit/test_editor.py for update_action_entry() function
-- [ ] T014 [P] Implement Allowlist and AllowlistEntry classes in tools/validator.py
-- [ ] T015 [P] Implement ValidationResult and ValidationError classes in tools/validator.py
-- [ ] T016 Implement load_allowlist() function in tools/validator.py (parse allowlist.yaml)
-- [ ] T017 Implement validate_inputs() function in tools/validator.py (JSON schema validation)
-- [ ] T018 Implement validate_daily_file() function in tools/validator.py (full validation per validator-contract.md)
-- [ ] T019 Create unit tests in tests/unit/test_validator.py for validation functions
-- [ ] T020 [P] Implement ExecutionReport and ActionResult classes in tools/executor.py
-- [ ] T021 Implement execute_action_script() function in tools/executor.py (subprocess stdin/stdout per executor-contract.md)
-- [ ] T022 Implement commit_action_result() function in tools/executor.py (git auto-commit with [skip ci])
-- [ ] T023 Implement execute_actions_from_file() function in tools/executor.py (main execution loop)
-- [ ] T024 Create mock action script in tests/fixtures/mock-success.py for testing
-- [ ] T025 Create integration tests in tests/integration/test_executor.py for execution workflow
+- [x] T005 [P] Implement ActionEntry class in tools/parser.py (data structure for parsed actions)
+- [x] T006 [P] Implement ParseError exception class in tools/parser.py with line number tracking
+- [x] T007 Implement parse_daily_file() function in tools/parser.py (regex + state machine parser per parser-contract.md)
+- [x] T008 [P] Create test fixtures in tests/fixtures/sample-day-pending.md (2-3 unchecked actions for testing)
+- [x] T009 Create unit tests in tests/unit/test_parser.py for parse_daily_file() function
+- [x] T010 [P] Implement ActionUpdate class in tools/editor.py (data structure for updates)
+- [x] T011 [P] Implement ActionNotFoundError and InvalidUpdateError exceptions in tools/editor.py
+- [x] T012 Implement update_action_entry() function in tools/editor.py (in-place markdown editor per editor-contract.md)
+- [x] T013 Create unit tests in tests/unit/test_editor.py for update_action_entry() function
+- [x] T014 [P] Implement Allowlist and AllowlistEntry classes in tools/validator.py
+- [x] T015 [P] Implement ValidationResult and ValidationError classes in tools/validator.py
+- [x] T016 Implement load_allowlist() function in tools/validator.py (parse allowlist.yaml)
+- [x] T017 Implement validate_inputs() function in tools/validator.py (JSON schema validation)
+- [x] T018 Implement validate_daily_file() function in tools/validator.py (full validation per validator-contract.md)
+- [x] T019 Create unit tests in tests/unit/test_validator.py for validation functions
+- [x] T020 [P] Implement ExecutionReport and ActionResult classes in tools/executor.py
+- [x] T021 Implement execute_action_script() function in tools/executor.py (subprocess stdin/stdout per executor-contract.md)
+- [x] T022 Implement commit_action_result() function in tools/executor.py (git auto-commit with [skip ci])
+- [x] T023 Implement execute_actions_from_file() function in tools/executor.py (main execution loop)
+- [x] T024 Create mock action script in tests/fixtures/mock-success.py for testing
+- [x] T025 Create integration tests in tests/integration/test_executor.py for execution workflow
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -76,14 +76,14 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T026 [P] [US1] Create example action schema in schemas/jira-comment.json (ticket + comment fields per spec examples)
-- [ ] T027 [P] [US1] Create example action script in scripts/jira-comment.py (stdin/stdout JSON interface per spec)
-- [ ] T028 [US1] Add jira-comment entry to actions/allowlist.yaml (script path, version 1.0, schema path, timeout 60, environment any)
-- [ ] T029 [P] [US1] Create PR validation CLI in tools/validator.py (--mode pr argument, exits 0 on success, 1 on failure)
-- [ ] T030 [US1] Create .github/workflows/pr-validation.yml (triggers on PR to main, validates actions/*.md files, no secrets)
-- [ ] T031 [US1] Create sample daily file in tests/fixtures/sample-pr-valid.md for testing PR validation
-- [ ] T032 [US1] Create sample daily file in tests/fixtures/sample-pr-invalid.md (invalid schema, version mismatch) for testing validation failures
-- [ ] T033 [US1] Test PR validation workflow end-to-end (create test PR, verify validation runs, check output)
+- [x] T026 [P] [US1] Create example action schema in schemas/jira-comment.json (ticket + comment fields per spec examples)
+- [x] T027 [P] [US1] Create example action script in scripts/jira-comment.py (stdin/stdout JSON interface per spec)
+- [x] T028 [US1] Add jira-comment entry to actions/allowlist.yaml (script path, version 1.0, schema path, timeout 60, environment any)
+- [x] T029 [P] [US1] Create PR validation CLI in tools/validator.py (--mode pr argument, exits 0 on success, 1 on failure)
+- [x] T030 [US1] Create .github/workflows/pr-validation.yml (triggers on PR to main, validates actions/*.md files, no secrets)
+- [x] T031 [US1] Create sample daily file in tests/fixtures/sample-pr-valid.md for testing PR validation
+- [x] T032 [US1] Create sample daily file in tests/fixtures/sample-pr-invalid.md (invalid schema, version mismatch) for testing validation failures
+- [x] T033 [US1] Test PR validation workflow end-to-end (create test PR, verify validation runs, check output)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - PRs with actions can be validated without execution
 
@@ -97,14 +97,14 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T034 [P] [US2] Create executor CLI in tools/executor.py (--file, --commit, --allowlist arguments)
-- [ ] T035 [US2] Add git configuration to executor (set user.name and user.email for automation commits)
-- [ ] T036 [US2] Implement environment detection in tools/executor.py (CI vs local via CI env var)
-- [ ] T037 [US2] Implement environment constraint checking in execute_actions_from_file() (skip actions with mismatched environment)
-- [ ] T038 [US2] Create .github/workflows/execute-actions.yml (triggers on push to main for actions/*.md, has concurrency group, includes secrets)
-- [ ] T039 [US2] Add workflow run ID capture in tools/executor.py (from GITHUB_RUN_ID environment variable)
-- [ ] T040 [US2] Create test fixtures in tests/fixtures/sample-day-complete.md (expected output after execution)
-- [ ] T041 [US2] Test execution workflow end-to-end (merge actions to main, verify execution, check committed results)
+- [x] T034 [P] [US2] Create executor CLI in tools/executor.py (--file, --commit, --allowlist arguments)
+- [x] T035 [US2] Add git configuration to executor (set user.name and user.email for automation commits)
+- [x] T036 [US2] Implement environment detection in tools/executor.py (CI vs local via CI env var)
+- [x] T037 [US2] Implement environment constraint checking in execute_actions_from_file() (skip actions with mismatched environment)
+- [x] T038 [US2] Create .github/workflows/execute-actions.yml (triggers on push to main for actions/*.md, has concurrency group, includes secrets)
+- [x] T039 [US2] Add workflow run ID capture in tools/executor.py (from GITHUB_RUN_ID environment variable)
+- [x] T040 [US2] Create test fixtures in tests/fixtures/sample-day-complete.md (expected output after execution)
+- [x] T041 [US2] Test execution workflow end-to-end (merge actions to main, verify execution, check committed results)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - full proposal → validation → merge → execution → commit flow
 
@@ -118,11 +118,11 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T042 [P] [US3] Add immutability check in tools/validator.py (reject PRs that modify checked actions in PR mode)
-- [ ] T043 [US3] Create test fixtures in tests/fixtures/sample-modify-checked.md (PR attempting to modify checked action)
-- [ ] T044 [US3] Add immutability validation test in tests/unit/test_validator.py (verify checked action modification rejected)
-- [ ] T045 [US3] Create README.md in repository root with overview of framework and link to quickstart.md
-- [ ] T046 [US3] Copy quickstart.md from specs/ to repository root docs/ directory for user visibility
+- [x] T042 [P] [US3] Add immutability check in tools/validator.py (reject PRs that modify checked actions in PR mode)
+- [x] T043 [US3] Create test fixtures in tests/fixtures/sample-modify-checked.md (PR attempting to modify checked action)
+- [x] T044 [US3] Add immutability validation test in tests/unit/test_validator.py (verify checked action modification rejected)
+- [x] T045 [US3] Create README.md in repository root with overview of framework and link to quickstart.md
+- [x] T046 [US3] Copy quickstart.md from specs/ to repository root docs/ directory for user visibility
 
 **Checkpoint**: User Story 3 complete - human review process is safe with immutability enforcement
 
@@ -136,12 +136,12 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 4
 
-- [ ] T047 [P] [US4] Create second example action schema in schemas/confluence-comment.json (pageId + comment fields)
-- [ ] T048 [P] [US4] Create second example action script in scripts/confluence-comment.py (demonstrates extensibility)
-- [ ] T049 [US4] Add confluence-comment entry to actions/allowlist.yaml
-- [ ] T050 [US4] Create developer guide in docs/adding-actions.md (how to add new action types per quickstart section)
-- [ ] T051 [US4] Create example showing two different action types in same daily file in tests/fixtures/sample-multi-action.md
-- [ ] T052 [US4] Test adding and executing new action type end-to-end
+- [x] T047 [P] [US4] Create second example action schema in schemas/confluence-comment.json (pageId + comment fields)
+- [x] T048 [P] [US4] Create second example action script in scripts/confluence-comment.py (demonstrates extensibility)
+- [x] T049 [US4] Add confluence-comment entry to actions/allowlist.yaml
+- [x] T050 [US4] Create developer guide in docs/adding-actions.md (how to add new action types per quickstart section)
+- [x] T051 [US4] Create example showing two different action types in same daily file in tests/fixtures/sample-multi-action.md
+- [x] T052 [US4] Test adding and executing new action type end-to-end
 
 **Checkpoint**: User Story 4 complete - framework is extensible for new action types
 
