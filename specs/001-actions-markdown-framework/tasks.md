@@ -76,14 +76,14 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T026 [P] [US1] Create example action schema in schemas/jira-comment.json (ticket + comment fields per spec examples)
-- [ ] T027 [P] [US1] Create example action script in scripts/jira-comment.py (stdin/stdout JSON interface per spec)
-- [ ] T028 [US1] Add jira-comment entry to actions/allowlist.yaml (script path, version 1.0, schema path, timeout 60, environment any)
-- [ ] T029 [P] [US1] Create PR validation CLI in tools/validator.py (--mode pr argument, exits 0 on success, 1 on failure)
-- [ ] T030 [US1] Create .github/workflows/pr-validation.yml (triggers on PR to main, validates actions/*.md files, no secrets)
-- [ ] T031 [US1] Create sample daily file in tests/fixtures/sample-pr-valid.md for testing PR validation
-- [ ] T032 [US1] Create sample daily file in tests/fixtures/sample-pr-invalid.md (invalid schema, version mismatch) for testing validation failures
-- [ ] T033 [US1] Test PR validation workflow end-to-end (create test PR, verify validation runs, check output)
+- [x] T026 [P] [US1] Create example action schema in schemas/jira-comment.json (ticket + comment fields per spec examples)
+- [x] T027 [P] [US1] Create example action script in scripts/jira-comment.py (stdin/stdout JSON interface per spec)
+- [x] T028 [US1] Add jira-comment entry to actions/allowlist.yaml (script path, version 1.0, schema path, timeout 60, environment any)
+- [x] T029 [P] [US1] Create PR validation CLI in tools/validator.py (--mode pr argument, exits 0 on success, 1 on failure)
+- [x] T030 [US1] Create .github/workflows/pr-validation.yml (triggers on PR to main, validates actions/*.md files, no secrets)
+- [x] T031 [US1] Create sample daily file in tests/fixtures/sample-pr-valid.md for testing PR validation
+- [x] T032 [US1] Create sample daily file in tests/fixtures/sample-pr-invalid.md (invalid schema, version mismatch) for testing validation failures
+- [x] T033 [US1] Test PR validation workflow end-to-end (create test PR, verify validation runs, check output)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - PRs with actions can be validated without execution
 
