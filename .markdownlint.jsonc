@@ -1,0 +1,42 @@
+{
+  // Enable all default markdownlint rules
+  "default": true,
+
+  // MD013: Line length - Disabled because specification documents and templates
+  // often contain long lines for clarity and readability (e.g., API descriptions,
+  // command examples, URLs). Breaking these lines would reduce readability.
+  "MD013": false,
+
+  // MD022: Headings surrounded by blank lines - Disabled because the constitution
+  // and plan documents use compact heading styles for better visual organization.
+  "MD022": false,
+
+  // MD031: Fenced code blocks surrounded by blank lines - Disabled because
+  // action definitions and YAML examples are embedded within lists and don't
+  // require blank lines for context.
+  "MD031": false,
+
+  // MD032: Lists surrounded by blank lines - Disabled because test fixtures
+  // and action definitions use compact list formatting adjacent to code blocks.
+  "MD032": false,
+
+  // MD033: Inline HTML - Disabled because agent templates use HTML elements
+  // (e.g., <Option>) for structured configuration options.
+  "MD033": false,
+
+  // MD040: Fenced code language - Disabled because many code blocks are
+  // YAML fragments or generic examples that don't require language tags.
+  "MD040": false,
+
+  // MD041: First line heading - Disabled because agent templates and command
+  // files start with contextual sections (## User Input) rather than H1.
+  "MD041": false,
+
+  // MD050: Strong style - Disabled because some documents use underscores
+  // for emphasis in specific contexts (tasks.md).
+  "MD050": false,
+
+  // MD060: Table column style - Disabled because tables in research documents
+  // use compact formatting that doesn't strictly align columns.
+  "MD060": false
+}
