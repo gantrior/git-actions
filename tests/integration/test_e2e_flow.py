@@ -217,6 +217,8 @@ import json
 input_data = json.load(sys.stdin)
 output = {"status": "success", "outputs": {"result": "ok"}}
 json.dump(output, sys.stdout)
+sys.stdout.flush()
+sys.exit(0)
 """)
         os.chmod(success_script, 0o755)
         
@@ -228,6 +230,7 @@ import json
 input_data = json.load(sys.stdin)
 output = {"status": "error", "error": "Simulated failure"}
 json.dump(output, sys.stdout)
+sys.stdout.flush()
 sys.exit(1)
 """)
         os.chmod(failure_script, 0o755)
@@ -341,6 +344,8 @@ import json
 input_data = json.load(sys.stdin)
 output = {"status": "success", "outputs": {"executed": True}}
 json.dump(output, sys.stdout)
+sys.stdout.flush()
+sys.exit(0)
 """)
         os.chmod(script_path, 0o755)
         
