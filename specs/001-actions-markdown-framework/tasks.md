@@ -139,9 +139,9 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 - [x] T047 [P] [US4] Create second example action schema in schemas/confluence-comment.json (pageId + comment fields)
 - [x] T048 [P] [US4] Create second example action script in scripts/confluence-comment.py (demonstrates extensibility)
 - [x] T049 [US4] Add confluence-comment entry to actions/allowlist.yaml
-- [ ] T050 [US4] Create developer guide in docs/adding-actions.md (how to add new action types per quickstart section)
-- [ ] T051 [US4] Create example showing two different action types in same daily file in tests/fixtures/sample-multi-action.md
-- [ ] T052 [US4] Test adding and executing new action type end-to-end
+- [x] T050 [US4] Create developer guide in docs/adding-actions.md (how to add new action types per quickstart section)
+- [x] T051 [US4] Create example showing two different action types in same daily file in tests/fixtures/sample-multi-action.md
+- [x] T052 [US4] Test adding and executing new action type end-to-end
 
 **Checkpoint**: User Story 4 complete - framework is extensible for new action types
 

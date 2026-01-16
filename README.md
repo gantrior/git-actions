@@ -32,9 +32,9 @@ See [docs/quickstart.md](docs/quickstart.md) for detailed usage guide on how to:
 ### Documentation
 
 - **[Quickstart Guide](docs/quickstart.md)** - How to use the framework
+- **[Adding Actions](docs/adding-actions.md)** - Guide for adding new action types
 - **[Specification](specs/001-actions-markdown-framework/spec.md)** - Complete feature spec
 - **[Implementation Plan](specs/001-actions-markdown-framework/plan.md)** - Technical design
-- **[Adding Actions](docs/adding-actions.md)** - Guide for adding new action types (coming soon)
 
 ### Core Components
 
