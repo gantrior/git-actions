@@ -51,12 +51,12 @@ description: "Task list for Actions-as-Markdown Framework implementation"
 - [x] T011 [P] Implement ActionNotFoundError and InvalidUpdateError exceptions in tools/editor.py
 - [x] T012 Implement update_action_entry() function in tools/editor.py (in-place markdown editor per editor-contract.md)
 - [x] T013 Create unit tests in tests/unit/test_editor.py for update_action_entry() function
-- [ ] T014 [P] Implement Allowlist and AllowlistEntry classes in tools/validator.py
-- [ ] T015 [P] Implement ValidationResult and ValidationError classes in tools/validator.py
-- [ ] T016 Implement load_allowlist() function in tools/validator.py (parse allowlist.yaml)
-- [ ] T017 Implement validate_inputs() function in tools/validator.py (JSON schema validation)
-- [ ] T018 Implement validate_daily_file() function in tools/validator.py (full validation per validator-contract.md)
-- [ ] T019 Create unit tests in tests/unit/test_validator.py for validation functions
+- [x] T014 [P] Implement Allowlist and AllowlistEntry classes in tools/validator.py
+- [x] T015 [P] Implement ValidationResult and ValidationError classes in tools/validator.py
+- [x] T016 Implement load_allowlist() function in tools/validator.py (parse allowlist.yaml)
+- [x] T017 Implement validate_inputs() function in tools/validator.py (JSON schema validation)
+- [x] T018 Implement validate_daily_file() function in tools/validator.py (full validation per validator-contract.md)
+- [x] T019 Create unit tests in tests/unit/test_validator.py for validation functions
 - [ ] T020 [P] Implement ExecutionReport and ActionResult classes in tools/executor.py
 - [ ] T021 Implement execute_action_script() function in tools/executor.py (subprocess stdin/stdout per executor-contract.md)
 - [ ] T022 Implement commit_action_result() function in tools/executor.py (git auto-commit with [skip ci])
