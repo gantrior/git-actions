@@ -1,37 +1,43 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: AI Action Hooks for Task Management Integration
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Branch**: `002-ai-action-hooks` | **Date**: 2026-01-19 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/002-ai-action-hooks/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+This feature extends the Actions-as-Markdown Framework to support custom hooks that execute when AI actions complete. The system will enable users to register hooks at specific lifecycle points (action start, success, failure, timeout) to integrate with external task management systems. When an action completes, registered hooks will execute to update task status, send notifications, or trigger other workflows. The implementation will be based on Python's existing action execution infrastructure, adding a hook registry, lifecycle event triggers, and execution handlers that maintain the framework's safety and auditability guarantees.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python 3.9+  
+**Primary Dependencies**: PyYAML (>=6.0), jsonschema (>=4.17.0), requests (>=2.28.0)  
+**Storage**: Files (YAML for hook configurations, markdown for action audit trail)  
+**Testing**: pytest (>=7.2.0) with pytest-cov for coverage  
+**Target Platform**: Linux/Unix CI environments (GitHub Actions, GitLab CI)
+**Project Type**: single (Python framework/library)  
+**Performance Goals**: Hook execution overhead <1s for 95th percentile, support 100 concurrent action completions  
+**Constraints**: Hook execution must not block action completion, maintain auditability via git history, preserve backwards compatibility with existing action framework  
+**Scale/Scope**: Support 10-100 hooks per repository, handle up to 1000 action executions per day
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Compliance Review
+
+- [ ] **Self-Documenting Code**: All new functions will be named to express domain intent (e.g., `execute_hook`, `register_lifecycle_callback`, `validate_hook_config`). No "what" comments will be added.
+- [ ] **Small Functions**: All functions will be ≤15 lines (target) or ≤25 lines (max with justification). Hook execution logic will be decomposed into: validation, invocation, error handling, and logging functions.
+- [ ] **Decomposition over Explanation**: Complex hook orchestration will be split into discrete steps: hook discovery, dependency ordering, parallel execution, result aggregation.
+- [ ] **Why-Only Comments**: Comments will only explain WHY decisions were made (e.g., "WHY: Async hooks use fire-and-forget to prevent blocking action completion").
+- [ ] **Naming Is Architecture**: All hook-related types will use clear domain names: `HookDefinition`, `LifecycleEvent`, `HookExecutionContext`, `HookExecutionResult`.
+- [ ] **Spec-First, Test-First**: All hook functionality will have tests written before implementation, based on acceptance criteria in spec.md.
+- [ ] **Simplicity and Explicitness**: No clever metaprogramming or dynamic imports. Hook discovery will use explicit YAML configuration, execution will use direct function calls.
+
+### Gates Status
+
+✅ **PASS**: This feature extends existing Python framework using established patterns. No new projects, languages, or frameworks required. Complexity is managed through function decomposition per constitution requirements.
 
 ## Project Structure
 
@@ -48,57 +54,42 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+actions/
+├── allowlist.yaml           # Allowlisted action types (existing)
+└── hooks.yaml              # Hook definitions for this feature (NEW)
+
+tools/
+├── parser.py               # Existing action parser
+├── validator.py            # Existing schema validator
+├── executor.py             # Existing action executor
+├── hook_manager.py         # NEW: Hook registry and lifecycle management
+├── hook_executor.py        # NEW: Hook execution engine
+└── hook_validator.py       # NEW: Hook configuration validation
+
+schemas/
+├── action.schema.json      # Existing action schema
+└── hook.schema.json        # NEW: Hook configuration JSON schema
 
 tests/
-├── contract/
+├── unit/
+│   ├── test_hook_manager.py        # NEW: Hook registry tests
+│   ├── test_hook_executor.py       # NEW: Hook execution tests
+│   └── test_hook_validator.py      # NEW: Hook validation tests
 ├── integration/
-└── unit/
+│   └── test_hook_lifecycle.py      # NEW: End-to-end hook lifecycle tests
+└── fixtures/
+    └── sample-hooks.yaml            # NEW: Test hook configurations
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+.github/
+└── workflows/
+    ├── validate-actions.yml        # Existing PR validation workflow
+    └── execute-actions.yml         # Existing action execution (will be extended)
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: This feature extends the existing single-project Python framework structure. All new hook-related functionality is added to the `tools/` directory following the existing pattern (manager, executor, validator). Hook configurations are stored in `actions/hooks.yaml` alongside the existing `allowlist.yaml`. Tests follow the existing unit/integration split in `tests/`.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+> No constitution violations. This section intentionally left empty as all complexity is managed through function decomposition per constitution requirements.
