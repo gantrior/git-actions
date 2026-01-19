@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gantrior/git-actions/schemas/hook-result.schema.json",
+  "title": "Hook Execution Result",
+  "description": "Schema for result data returned by hook scripts via stdout",
+  "type": "object",
+  "required": ["success"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the hook completed successfully"
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable result message",
+      "maxLength": 1000,
+      "examples": [
+        "Updated Jira status to Done",
+        "Sent notification to Slack channel #engineering"
+      ]
+    },
+    "details": {
+      "type": "object",
+      "description": "Additional result data from hook script",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "old_status": "In Progress",
+          "new_status": "Done",
+          "transition_id": "31"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}
