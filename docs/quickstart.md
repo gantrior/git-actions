@@ -3,6 +3,8 @@
 **Feature**: 001-actions-markdown-framework  
 **Audience**: Developers and AI assistants proposing actions
 
+> **New to the framework?** See the [Installation Guide](installation.md) first to set up the framework in your repository.
+
 ---
 
 ## What is this?
@@ -374,105 +376,7 @@ meta:
 
 ## Adding New Action Types
 
-### 1. Write the action script
-
-**Example**: `scripts/slack-message.py`
-
-```python
-#!/usr/bin/env python3
-import sys
-import json
-import os
-import requests
-
-# Read input from stdin
-input_data = json.load(sys.stdin)
-inputs = input_data["inputs"]
-
-try:
-    # Post to Slack webhook
-    webhook_url = os.environ["SLACK_WEBHOOK_URL"]
-    response = requests.post(
-        webhook_url,
-        json={"text": inputs["message"]},
-        timeout=30
-    )
-    response.raise_for_status()
-    
-    # Output success
-    output = {
-        "status": "success",
-        "outputs": {
-            "messageId": response.headers.get("X-Slack-Req-Id", "unknown")
-        }
-    }
-    
-except Exception as e:
-    # Output error
-    output = {
-        "status": "error",
-        "outputs": {},
-        "error": str(e)
-    }
-
-# Write to stdout
-json.dump(output, sys.stdout)
-sys.exit(0 if output["status"] == "success" else 1)
-```
-
-**Make executable**:
-```bash
-chmod +x scripts/slack-message.py
-```
-
-### 2. Create the JSON schema
-
-**Example**: `schemas/slack-message.json`
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "required": ["message"],
-  "properties": {
-    "message": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Message text to post to Slack"
-    }
-  },
-  "additionalProperties": false
-}
-```
-
-### 3. Add to allowlist
-
-Edit `actions/allowlist.yaml`:
-
-```yaml
-slack-message:
-  script: "scripts/slack-message.py"
-  version: "1.0"
-  schema: "schemas/slack-message.json"
-  timeout: 30
-  environment: "any"
-```
-
-### 4. Test with a PR
-
-Create test action:
-
-```markdown
-- [ ] `test1` — *slack-message* v1.0
-```yaml
-inputs:
-  message: "Hello from actions-as-markdown!"
-outputs: {}
-meta: {}
-```
-```
-
-Create PR → Validation passes → Merge → Action executes → Check results
+**Action not in allowlist?** See the [Installation Guide](installation.md#step-4-create-your-first-custom-action) for a complete example, or the [Adding Actions Guide](adding-actions.md) for detailed instructions on creating custom action types.
 
 ---
 
