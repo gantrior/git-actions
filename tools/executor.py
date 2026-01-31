@@ -138,25 +138,16 @@ def execute_action_script(
         )
         duration = time.time() - start_time
         
-        # Check for non-zero exit code
-        if result.returncode != 0:
-            # Try to parse stderr for error message
-            error_msg = result.stderr.strip() if result.stderr else f"Script exited with code {result.returncode}"
-            return {
-                "status": "error",
-                "outputs": {},
-                "error": error_msg
-            }
-        
-        # Parse JSON output from stdout
+        # Parse JSON output from stdout (regardless of exit code)
         try:
             output_data = json.loads(result.stdout)
         except json.JSONDecodeError as e:
-            return {
-                "status": "error",
-                "outputs": {},
-                "error": f"Invalid JSON output from script: {str(e)}"
-            }
+            # If parsing fails and we have a non-zero exit code, try stderr
+            if result.returncode != 0:
+                error_msg = result.stderr.strip() if result.stderr else f"Script exited with code {result.returncode}"
+                return {"status": "error", "outputs": {}, "error": error_msg}
+            # If exit code is 0 but JSON is invalid, that's an error
+            return {"status": "error", "outputs": {}, "error": f"Invalid JSON output from script: {str(e)}"}
         
         # Validate output structure
         if not isinstance(output_data, dict):

@@ -22,7 +22,7 @@ def main():
     json.dump(output, sys.stdout)
     sys.stdout.flush()
     
-    return 0
+    return 1
 
 if __name__ == "__main__":
     sys.exit(main())
