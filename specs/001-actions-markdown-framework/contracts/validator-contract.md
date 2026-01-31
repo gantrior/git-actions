@@ -187,14 +187,14 @@ import json
 def validate_inputs(inputs, schema_path):
     with open(schema_path) as f:
         schema = json.load(f)
-    
+
     errors = []
     try:
         validate(instance=inputs, schema=schema)
     except SchemaValidationError as e:
         # Convert jsonschema errors to human-readable messages
         errors.append(f"{e.message} at {'.'.join(str(p) for p in e.path)}")
-    
+
     return errors
 ```
 
@@ -253,7 +253,7 @@ else:
 actions/2026-01-15.md:
   Action 'a1' (jira-comment v1.0) - Line 42
     [schema] Field 'ticket' is required but missing
-  
+
   Action 'a2' (confluence-comment v2.0) - Line 58
     [version] Version mismatch: action has v2.0, allowlist expects v1.0
 ```

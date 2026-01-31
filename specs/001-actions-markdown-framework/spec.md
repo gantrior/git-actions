@@ -479,7 +479,7 @@ try:
     # Get Jira credentials from environment
     jira_url = os.environ["JIRA_URL"]
     jira_token = os.environ["JIRA_TOKEN"]
-    
+
     # Post comment
     response = requests.post(
         f"{jira_url}/rest/api/2/issue/{inputs['ticket']}/comment",
@@ -488,10 +488,10 @@ try:
         timeout=30
     )
     response.raise_for_status()
-    
+
     # Extract result
     result = response.json()
-    
+
     # Output success
     output = {
         "status": "success",
@@ -500,11 +500,11 @@ try:
             "commentId": str(result["id"])
         }
     }
-    
+
 except Exception as e:
     # Log to stderr
     print(f"Error posting Jira comment: {e}", file=sys.stderr)
-    
+
     # Output error
     output = {
         "status": "error",
@@ -536,16 +536,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: |
           pip install pyyaml jsonschema
-      
+
       - name: Validate action files
         run: |
           python tools/validator.py --mode pr
@@ -577,16 +577,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: |
           pip install pyyaml jsonschema requests
-      
+
       - name: Execute pending actions
         env:
           JIRA_URL: ${{ secrets.JIRA_URL }}
@@ -595,7 +595,7 @@ jobs:
           CONFLUENCE_TOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
         run: |
           python tools/executor.py --commit
-      
+
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"

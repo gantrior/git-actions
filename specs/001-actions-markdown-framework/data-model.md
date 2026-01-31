@@ -318,7 +318,7 @@ Daily Action File (1)
   ├─ Validate inputs against Schema
   ├─ Reject if checked actions modified
   └─ PASS or FAIL (no external calls)
-  
+
 [PR merged to main]
   ↓ (execution workflow triggered)
 [Execution workflow]

@@ -84,10 +84,10 @@ def parse_yaml_block(yaml_text: str) -> dict:
 def update_action_entry(file_path: str, action_id: str, updates: dict):
     lines = read_file_lines(file_path)
     output_lines = []
-    
+
     in_target_action = False
     in_yaml_block = False
-    
+
     for line in lines:
         if matches_action_header(line):
             current_id = extract_action_id(line)
@@ -97,19 +97,19 @@ def update_action_entry(file_path: str, action_id: str, updates: dict):
                 output_lines.extend(generate_action_entry(action_id, updates))
                 # Skip original YAML block
                 continue
-        
+
         if in_target_action and line.startswith("```yaml"):
             in_yaml_block = True
             continue
-        
+
         if in_target_action and in_yaml_block and line.startswith("```"):
             in_yaml_block = False
             in_target_action = False
             continue
-        
+
         if not in_target_action:
             output_lines.append(line)
-    
+
     write_file_lines(file_path, output_lines)
 ```
 
@@ -140,7 +140,7 @@ import json
 def validate_action_inputs(action_name: str, inputs: dict, schema_path: str):
     with open(schema_path) as f:
         schema = json.load(f)
-    
+
     try:
         validate(instance=inputs, schema=schema)
     except ValidationError as e:
@@ -179,7 +179,7 @@ def execute_action_script(script_path: str, inputs: dict, timeout: int) -> dict:
         "version": version,
         "inputs": inputs
     })
-    
+
     result = subprocess.run(
         [script_path],
         input=input_json,
@@ -188,14 +188,14 @@ def execute_action_script(script_path: str, inputs: dict, timeout: int) -> dict:
         timeout=timeout,
         env=os.environ  # Pass secrets via environment
     )
-    
+
     if result.returncode != 0:
         return {
             "status": "error",
             "outputs": {},
             "error": result.stderr or "Script exited with non-zero code"
         }
-    
+
     return json.loads(result.stdout)
 ```
 
@@ -249,13 +249,13 @@ concurrency:
 ```python
 def commit_action_result(file_path: str, action_id: str):
     subprocess.run(["git", "add", file_path], check=True)
-    
+
     # Check if there are changes to commit
     result = subprocess.run(
         ["git", "diff", "--staged", "--quiet"],
         capture_output=True
     )
-    
+
     if result.returncode != 0:  # There are changes
         subprocess.run(
             ["git", "commit", "-m", f"Execute action {action_id} [skip ci]"],
@@ -299,7 +299,7 @@ def execute_actions(actions: list[Action]):
             result = execute_action(action)
         except Exception as e:
             result = {"status": "error", "error": str(e)}
-        
+
         # Always record result, even if error
         update_action_entry(action.id, result)
 ```
@@ -331,14 +331,14 @@ def execute_actions(actions: list[Action]):
 def test_execute_actions_updates_file():
     # Copy fixture to temp location
     temp_file = copy_fixture("sample-day-pending.md")
-    
+
     # Execute with mock script
     execute_actions_from_file(temp_file, mock_script_dir)
-    
+
     # Compare with expected output
     expected = read_fixture("sample-day-complete.md")
     actual = read_file(temp_file)
-    
+
     assert actual == expected
 ```
 
@@ -377,7 +377,7 @@ def execute_pending_actions(actions: list[Action]):
         if action.is_checked:
             print(f"Skipping {action.id} (already executed)")
             continue
-        
+
         # Execute unchecked actions only
         result = execute_action_script(action)
         update_and_commit(action.id, result)

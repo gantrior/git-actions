@@ -398,7 +398,7 @@ try:
         timeout=30
     )
     response.raise_for_status()
-    
+
     # Output success
     output = {
         "status": "success",
@@ -406,7 +406,7 @@ try:
             "messageId": response.headers.get("X-Slack-Req-Id", "unknown")
         }
     }
-    
+
 except Exception as e:
     # Output error
     output = {

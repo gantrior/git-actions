@@ -13,3 +13,6 @@ requests>=2.28.0,<3.0
 # Testing framework
 pytest>=7.2.0,<8.0
 pytest-cov>=4.0.0,<5.0
+
+# Code quality (pre-commit framework)
+pre-commit>=4.0.0,<5.0
