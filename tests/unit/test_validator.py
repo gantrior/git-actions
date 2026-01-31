@@ -1,22 +1,26 @@
 """Unit tests for validator.py module."""
 
-import pytest
 import os
 import tempfile
-import json
-import yaml
+
+import pytest
 
 from tools.validator import (
-    validate_daily_file, load_allowlist, validate_inputs,
-    ValidationResult, ValidationError, Allowlist, AllowlistEntry,
-    get_current_environment
+    Allowlist,
+    AllowlistEntry,
+    ValidationError,
+    ValidationResult,
+    get_current_environment,
+    load_allowlist,
+    validate_daily_file,
+    validate_inputs,
 )
 
 
 def test_load_allowlist():
     """Load allowlist from YAML file."""
     allowlist = load_allowlist("tests/fixtures/test-allowlist.yaml")
-    
+
     assert isinstance(allowlist, Allowlist)
     assert allowlist.is_allowed("test-action")
     assert not allowlist.is_allowed("nonexistent-action")
@@ -32,7 +36,7 @@ def test_allowlist_entry_properties():
     """AllowlistEntry should have all required properties."""
     allowlist = load_allowlist("tests/fixtures/test-allowlist.yaml")
     entry = allowlist.get_entry("test-action")
-    
+
     assert entry is not None
     assert entry.script == "tests/fixtures/mock-success.py"
     assert entry.version == "1.0"
@@ -44,7 +48,7 @@ def test_allowlist_entry_properties():
 def test_allowlist_validate_version():
     """Should validate version matches allowlist."""
     allowlist = load_allowlist("tests/fixtures/test-allowlist.yaml")
-    
+
     assert allowlist.validate_version("test-action", "1.0") is True
     assert allowlist.validate_version("test-action", "2.0") is False
     assert allowlist.validate_version("nonexistent", "1.0") is False
@@ -53,32 +57,23 @@ def test_allowlist_validate_version():
 def test_allowlist_entry_can_run_in_environment():
     """AllowlistEntry should check environment constraints."""
     entry_any = AllowlistEntry(
-        script="test.py",
-        version="1.0",
-        schema="test.json",
-        environment="any"
+        script="test.py", version="1.0", schema="test.json", environment="any"
     )
     entry_ci = AllowlistEntry(
-        script="test.py",
-        version="1.0",
-        schema="test.json",
-        environment="ci-only"
+        script="test.py", version="1.0", schema="test.json", environment="ci-only"
     )
     entry_local = AllowlistEntry(
-        script="test.py",
-        version="1.0",
-        schema="test.json",
-        environment="local-only"
+        script="test.py", version="1.0", schema="test.json", environment="local-only"
     )
-    
+
     # "any" can run in both environments
     assert entry_any.can_run_in_environment("ci") is True
     assert entry_any.can_run_in_environment("local") is True
-    
+
     # "ci-only" can only run in CI
     assert entry_ci.can_run_in_environment("ci") is True
     assert entry_ci.can_run_in_environment("local") is False
-    
+
     # "local-only" can only run locally
     assert entry_local.can_run_in_environment("ci") is False
     assert entry_local.can_run_in_environment("local") is True
@@ -86,10 +81,7 @@ def test_allowlist_entry_can_run_in_environment():
 
 def test_validate_inputs_valid():
     """Should validate valid inputs against schema."""
-    inputs = {
-        "ticket": "PROJ-123",
-        "comment": "Test comment"
-    }
+    inputs = {"ticket": "PROJ-123", "comment": "Test comment"}
     errors = validate_inputs(inputs, "tests/fixtures/test-schema.json")
     assert errors == []
 
@@ -109,7 +101,7 @@ def test_validate_inputs_invalid_pattern():
     """Should detect invalid field pattern."""
     inputs = {
         "ticket": "invalid-format",  # Should be PROJ-123 format
-        "comment": "Test comment"
+        "comment": "Test comment",
     }
     errors = validate_inputs(inputs, "tests/fixtures/test-schema.json")
     assert len(errors) > 0
@@ -117,11 +109,7 @@ def test_validate_inputs_invalid_pattern():
 
 def test_validate_inputs_additional_properties():
     """Should detect additional properties when not allowed."""
-    inputs = {
-        "ticket": "PROJ-123",
-        "comment": "Test comment",
-        "extra_field": "not allowed"
-    }
+    inputs = {"ticket": "PROJ-123", "comment": "Test comment", "extra_field": "not allowed"}
     errors = validate_inputs(inputs, "tests/fixtures/test-schema.json")
     assert len(errors) > 0
     assert "additional" in errors[0].lower() or "extra_field" in errors[0]
@@ -140,9 +128,9 @@ def test_validate_daily_file_valid():
         file_path="tests/fixtures/sample-day-pending.md",
         allowlist_path="tests/fixtures/test-allowlist.yaml",
         schemas_dir="tests/fixtures/",
-        mode="pr"
+        mode="pr",
     )
-    
+
     assert result.is_valid is True
     assert len(result.errors) == 0
     assert result.is_valid is True
@@ -160,18 +148,18 @@ outputs: {}
 meta: {}
 ```
 """
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(content)
         temp_file = f.name
-    
+
     try:
         result = validate_daily_file(
             file_path=temp_file,
             allowlist_path="tests/fixtures/test-allowlist.yaml",
             schemas_dir="tests/fixtures/",
-            mode="pr"
+            mode="pr",
         )
-        
+
         assert result.is_valid is False
         assert len(result.errors) > 0
         assert any(e.error_type == "allowlist" for e in result.errors)
@@ -191,18 +179,18 @@ outputs: {}
 meta: {}
 ```
 """
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(content)
         temp_file = f.name
-    
+
     try:
         result = validate_daily_file(
             file_path=temp_file,
             allowlist_path="tests/fixtures/test-allowlist.yaml",
             schemas_dir="tests/fixtures/",
-            mode="pr"
+            mode="pr",
         )
-        
+
         assert result.is_valid is False
         assert any(e.error_type == "version" for e in result.errors)
     finally:
@@ -220,18 +208,18 @@ outputs: {}
 meta: {}
 ```
 """
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(content)
         temp_file = f.name
-    
+
     try:
         result = validate_daily_file(
             file_path=temp_file,
             allowlist_path="tests/fixtures/test-allowlist.yaml",
             schemas_dir="tests/fixtures/",
-            mode="pr"
+            mode="pr",
         )
-        
+
         assert result.is_valid is False
         assert any(e.error_type == "schema" for e in result.errors)
     finally:
@@ -251,18 +239,18 @@ meta:
   executedAt: "2026-01-15T14:32:11Z"
 ```
 """
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(content)
         temp_file = f.name
-    
+
     try:
         result = validate_daily_file(
             file_path=temp_file,
             allowlist_path="tests/fixtures/test-allowlist.yaml",
             schemas_dir="tests/fixtures/",
-            mode="pr"
+            mode="pr",
         )
-        
+
         assert result.is_valid is False
         assert any(e.error_type == "immutability" for e in result.errors)
     finally:
@@ -282,18 +270,18 @@ meta:
   executedAt: "2026-01-15T14:32:11Z"
 ```
 """
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(content)
         temp_file = f.name
-    
+
     try:
         result = validate_daily_file(
             file_path=temp_file,
             allowlist_path="tests/fixtures/test-allowlist.yaml",
             schemas_dir="tests/fixtures/",
-            mode="execution"
+            mode="execution",
         )
-        
+
         assert result.is_valid is True
         assert not any(e.error_type == "immutability" for e in result.errors)
     finally:
@@ -319,18 +307,18 @@ outputs: {}
 meta: {}
 ```
 """
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(content)
         temp_file = f.name
-    
+
     try:
         result = validate_daily_file(
             file_path=temp_file,
             allowlist_path="tests/fixtures/test-allowlist.yaml",
             schemas_dir="tests/fixtures/",
-            mode="pr"
+            mode="pr",
         )
-        
+
         assert result.is_valid is False
         # Should have at least 2 errors (allowlist + version)
         assert len(result.errors) >= 2
@@ -344,16 +332,13 @@ def test_validation_result_to_dict():
         is_valid=False,
         errors=[
             ValidationError(
-                action_id="a1",
-                error_type="schema",
-                message="Test error",
-                line_number=42
+                action_id="a1", error_type="schema", message="Test error", line_number=42
             )
         ],
         warnings=["Test warning"],
-        file_path="test.md"
+        file_path="test.md",
     )
-    
+
     data = result.to_dict()
     assert data["is_valid"] is False
     assert data["file_path"] == "test.md"
@@ -365,11 +350,8 @@ def test_validation_result_to_dict():
 
 def test_validation_result_print_report(capsys):
     """ValidationResult should print readable report."""
-    result = ValidationResult(
-        is_valid=True,
-        file_path="test.md"
-    )
-    
+    result = ValidationResult(is_valid=True, file_path="test.md")
+
     result.print_report()
     captured = capsys.readouterr()
     assert "✅" in captured.out or "valid" in captured.out.lower()

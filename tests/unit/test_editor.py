@@ -1,7 +1,8 @@
 """Unit tests for editor.py module."""
 
 import pytest
-from tools.editor import update_action_entry, ActionUpdate, ActionNotFoundError, InvalidUpdateError
+
+from tools.editor import ActionNotFoundError, ActionUpdate, InvalidUpdateError, update_action_entry
 
 
 def test_update_check_box():
@@ -16,7 +17,7 @@ meta: {}
 """
     update = ActionUpdate(action_id="a1", check_box=True)
     result = update_action_entry(content, update)
-    
+
     assert "- [x] `a1`" in result
     assert "- [ ] `a1`" not in result
 
@@ -32,13 +33,12 @@ meta: {}
 ```
 """
     update = ActionUpdate(
-        action_id="a1",
-        outputs={"commentUrl": "https://example.com", "commentId": "456"}
+        action_id="a1", outputs={"commentUrl": "https://example.com", "commentId": "456"}
     )
     result = update_action_entry(content, update)
-    
+
     assert "commentUrl: https://example.com" in result
-    assert "commentId: '456'" in result or "commentId: \"456\"" in result
+    assert "commentId: '456'" in result or 'commentId: "456"' in result
 
 
 def test_update_meta():
@@ -52,13 +52,15 @@ meta: {}
 ```
 """
     update = ActionUpdate(
-        action_id="a1",
-        meta={"executedAt": "2026-01-15T14:32:11Z", "runId": "1234567890"}
+        action_id="a1", meta={"executedAt": "2026-01-15T14:32:11Z", "runId": "1234567890"}
     )
     result = update_action_entry(content, update)
-    
-    assert "executedAt: '2026-01-15T14:32:11Z'" in result or "executedAt: \"2026-01-15T14:32:11Z\"" in result
-    assert "runId: '1234567890'" in result or "runId: \"1234567890\"" in result
+
+    assert (
+        "executedAt: '2026-01-15T14:32:11Z'" in result
+        or 'executedAt: "2026-01-15T14:32:11Z"' in result
+    )
+    assert "runId: '1234567890'" in result or 'runId: "1234567890"' in result
 
 
 def test_update_all_fields():
@@ -75,10 +77,10 @@ meta: {}
         action_id="a1",
         check_box=True,
         outputs={"commentUrl": "https://example.com"},
-        meta={"executedAt": "2026-01-15T14:32:11Z"}
+        meta={"executedAt": "2026-01-15T14:32:11Z"},
     )
     result = update_action_entry(content, update)
-    
+
     assert "- [x] `a1`" in result
     assert "commentUrl: https://example.com" in result
     assert "executedAt:" in result
@@ -95,12 +97,9 @@ outputs: {}
 meta: {}
 ```
 """
-    update = ActionUpdate(
-        action_id="a1",
-        outputs={"commentUrl": "https://example.com"}
-    )
+    update = ActionUpdate(action_id="a1", outputs={"commentUrl": "https://example.com"})
     result = update_action_entry(content, update)
-    
+
     assert "ticket: PROJ-123" in result
     assert "comment: Test comment" in result
 
@@ -116,12 +115,9 @@ outputs:
 meta: {}
 ```
 """
-    update = ActionUpdate(
-        action_id="a1",
-        outputs={"newField": "value2"}
-    )
+    update = ActionUpdate(action_id="a1", outputs={"newField": "value2"})
     result = update_action_entry(content, update)
-    
+
     assert "existingField: value1" in result
     assert "newField: value2" in result
 
@@ -146,7 +142,7 @@ meta: {}
 """
     update = ActionUpdate(action_id="a2", check_box=True)
     result = update_action_entry(content, update)
-    
+
     # a1 should remain unchecked
     assert "- [ ] `a1`" in result
     # a2 should be checked
@@ -164,10 +160,10 @@ meta: {}
 ```
 """
     update = ActionUpdate(action_id="nonexistent", check_box=True)
-    
+
     with pytest.raises(ActionNotFoundError) as exc_info:
         update_action_entry(content, update)
-    
+
     assert "nonexistent" in str(exc_info.value)
 
 
@@ -184,10 +180,10 @@ meta:
 ```
 """
     update = ActionUpdate(action_id="a1", outputs={"newField": "value"})
-    
+
     with pytest.raises(InvalidUpdateError) as exc_info:
         update_action_entry(content, update)
-    
+
     assert "immutable" in str(exc_info.value).lower()
     assert "a1" in str(exc_info.value)
 
@@ -206,7 +202,7 @@ meta:
 """
     update = ActionUpdate(action_id="a1", outputs={"newField": "value"})
     result = update_action_entry(content, update, allow_modify_checked=True)
-    
+
     assert "newField: value" in result
     assert "- [x] `a1`" in result  # Should remain checked
 
@@ -229,7 +225,7 @@ Some closing notes.
 """
     update = ActionUpdate(action_id="a1", check_box=True)
     result = update_action_entry(content, update)
-    
+
     assert "# Daily Actions" in result
     assert "Some introduction text." in result
     assert "Some closing notes." in result

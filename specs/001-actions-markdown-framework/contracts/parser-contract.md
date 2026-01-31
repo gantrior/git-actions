@@ -115,14 +115,14 @@ from tools.parser import parse_daily_file, ActionEntry, ParseError
 
 try:
     actions = parse_daily_file("actions/2026-01-15.md")
-    
+
     for action in actions:
         print(f"Action {action.id}: {action.name} v{action.version}")
         if action.is_pending():
             print("  Status: Pending execution")
         else:
             print(f"  Status: Completed at {action.meta.get('executedAt')}")
-            
+
 except ParseError as e:
     print(f"ERROR: {e}")
     sys.exit(1)

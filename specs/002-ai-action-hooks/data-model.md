@@ -200,13 +200,13 @@ Task from external task management system. Not stored by the framework, but refe
 ```
 HookDefinition (1) --executes--> (N) HookExecutionLog
   - One hook definition can have many execution log entries
-  
+
 HookExecutionContext (1) --produces--> (1) HookExecutionResult
   - One execution context produces one result per execution
-  
+
 HookExecutionResult (1) --recorded-as--> (1) HookExecutionLog
   - Each execution result is recorded as one log entry
-  
+
 Task (1) --triggers--> (N) HookExecutionContext
   - One task can trigger multiple hooks at different lifecycle points
 ```

@@ -102,11 +102,11 @@ InvalidUpdateError: Cannot modify checked action 'a1' (action is immutable)
 def update_action_entry(file_path, action_id, updates):
     lines = read_file_lines(file_path)
     output_lines = []
-    
+
     found = False
     in_target_action = False
     in_yaml_block = False
-    
+
     for i, line in enumerate(lines):
         # Check if this line is an action header
         match = ACTION_HEADER_PATTERN.match(line)
@@ -115,12 +115,12 @@ def update_action_entry(file_path, action_id, updates):
             if current_id == action_id:
                 found = True
                 in_target_action = True
-                
+
                 # Validate update is allowed
                 is_checked = match.group(1) == 'x'
                 if is_checked and updates.inputs is not None:
                     raise InvalidUpdateError(f"Cannot modify inputs of checked action '{action_id}'")
-                
+
                 # Generate updated action entry
                 updated_entry = generate_action_entry(
                     action_id=action_id,
@@ -133,28 +133,28 @@ def update_action_entry(file_path, action_id, updates):
                 )
                 output_lines.extend(updated_entry)
                 continue
-        
+
         # Skip original YAML block for target action
         if in_target_action and line.startswith("```yaml"):
             in_yaml_block = True
             continue
-        
+
         if in_target_action and in_yaml_block and line.startswith("```"):
             in_yaml_block = False
             in_target_action = False
             continue
-        
+
         if in_target_action and in_yaml_block:
             # Skip lines in original YAML block
             continue
-        
+
         # Preserve all non-target lines
         if not in_target_action:
             output_lines.append(line)
-    
+
     if not found:
         raise ActionNotFoundError(action_id, file_path)
-    
+
     write_file_lines(file_path, output_lines)
 ```
 
@@ -172,7 +172,7 @@ def update_action_entry(file_path, action_id, updates):
 ```diff
 - # Actions for 2026-01-15
 + # Actions for 2026-01-15  
-  
+
 - - [ ] `a1` — *jira-comment* v1.0
 + - [x] `a1` — *jira-comment* v1.0
 ```
@@ -211,10 +211,10 @@ try:
             "runId": "1234567890"
         }
     )
-    
+
     update_action_entry("actions/2026-01-15.md", "a1", update)
     print("Action a1 marked as complete")
-    
+
 except InvalidUpdateError as e:
     print(f"ERROR: {e}")
     sys.exit(1)
