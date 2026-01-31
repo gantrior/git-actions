@@ -184,11 +184,11 @@ import os
 
 def execute_action_script(script_path, action_data, timeout):
     start_time = time.time()
-    
+
     try:
         # Prepare input JSON
         input_json = json.dumps(action_data)
-        
+
         # Execute script with timeout
         result = subprocess.run(
             [script_path],
@@ -199,7 +199,7 @@ def execute_action_script(script_path, action_data, timeout):
             env=os.environ,  # Pass environment (includes secrets)
             check=False  # Don't raise on non-zero exit
         )
-        
+
         # Parse output
         if result.returncode == 0:
             try:
@@ -219,7 +219,7 @@ def execute_action_script(script_path, action_data, timeout):
                 "outputs": {},
                 "error": f"Script failed: {stderr}"
             }
-            
+
     except subprocess.TimeoutExpired:
         return {
             "status": "error",
@@ -256,9 +256,9 @@ Execute action {action_id} [skip ci]
 def should_skip_action(action_entry, allowlist_entry):
     """Determine if action should be skipped based on environment."""
     current_env = "ci" if os.environ.get("CI") == "true" else "local"
-    
+
     env_constraint = allowlist_entry.environment
-    
+
     if env_constraint == "any":
         return False
     elif env_constraint == "ci-only" and current_env == "local":

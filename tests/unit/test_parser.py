@@ -1,7 +1,8 @@
 """Unit tests for parser.py module."""
 
 import pytest
-from tools.parser import parse_daily_file, ParseError, ActionEntry
+
+from tools.parser import ParseError, parse_daily_file
 
 
 def test_parse_empty_file():
@@ -34,7 +35,7 @@ meta: {}
 """
     actions = parse_daily_file(content)
     assert len(actions) == 1
-    
+
     action = actions[0]
     assert action.id == "a1"
     assert action.name == "test-action"
@@ -63,37 +64,34 @@ meta:
 """
     actions = parse_daily_file(content)
     assert len(actions) == 1
-    
+
     action = actions[0]
     assert action.is_checked is True
     assert action.outputs == {
         "commentUrl": "https://jira.example.com/browse/PROJ-123#comment-456",
-        "commentId": "456"
+        "commentId": "456",
     }
-    assert action.meta == {
-        "executedAt": "2026-01-15T14:32:11Z",
-        "runId": "1234567890"
-    }
+    assert action.meta == {"executedAt": "2026-01-15T14:32:11Z", "runId": "1234567890"}
 
 
 def test_parse_multiple_actions():
     """Parse multiple actions from fixture file."""
-    with open('tests/fixtures/sample-day-pending.md', 'r') as f:
+    with open("tests/fixtures/sample-day-pending.md") as f:
         content = f.read()
-    
-    actions = parse_daily_file(content, filename='sample-day-pending.md')
+
+    actions = parse_daily_file(content, filename="sample-day-pending.md")
     assert len(actions) == 3
-    
+
     # Check first action
     assert actions[0].id == "a1"
     assert actions[0].name == "test-action"
     assert actions[0].inputs["ticket"] == "PROJ-123"
-    
+
     # Check second action (multiline comment)
     assert actions[1].id == "a2"
     assert "Updated documentation" in actions[1].inputs["comment"]
     assert "PR #456" in actions[1].inputs["comment"]
-    
+
     # Check third action (different action type)
     assert actions[2].id == "a3"
     assert actions[2].name == "test-action"
@@ -137,7 +135,7 @@ inputs:
 """
     with pytest.raises(ParseError) as exc_info:
         parse_daily_file(content, filename="test.md")
-    
+
     assert "Expected '```yaml'" in str(exc_info.value)
     assert "line 1" in str(exc_info.value)
     assert "test.md" in str(exc_info.value)
@@ -152,7 +150,7 @@ inputs:
 """
     with pytest.raises(ParseError) as exc_info:
         parse_daily_file(content, filename="test.md")
-    
+
     assert "Missing closing '```'" in str(exc_info.value)
     assert "a1" in str(exc_info.value)
 
@@ -169,7 +167,7 @@ inputs:
 """
     with pytest.raises(ParseError) as exc_info:
         parse_daily_file(content, filename="test.md")
-    
+
     assert "Invalid YAML" in str(exc_info.value)
     assert "a1" in str(exc_info.value)
 
@@ -184,7 +182,7 @@ def test_parse_error_yaml_not_dict():
 """
     with pytest.raises(ParseError) as exc_info:
         parse_daily_file(content, filename="test.md")
-    
+
     assert "must be a dictionary" in str(exc_info.value)
 
 
@@ -199,7 +197,7 @@ meta: {}
 """
     with pytest.raises(ParseError) as exc_info:
         parse_daily_file(content, filename="test.md")
-    
+
     assert "'inputs' must be a dictionary" in str(exc_info.value)
 
 

@@ -70,12 +70,12 @@ def main():
         # Read input from stdin
         input_data = json.load(sys.stdin)
         inputs = input_data.get("inputs", {})
-        
+
         # Extract inputs
         channel = inputs.get("channel")
         message = inputs.get("message")
         thread_ts = inputs.get("threadTs")
-        
+
         # Get Slack token from environment
         slack_token = os.environ.get("SLACK_BOT_TOKEN")
         if not slack_token:
@@ -86,7 +86,7 @@ def main():
             }
             json.dump(output, sys.stdout)
             return 1
-        
+
         # Call Slack API
         response = requests.post(
             "https://slack.com/api/chat.postMessage",
@@ -97,9 +97,9 @@ def main():
                 "thread_ts": thread_ts
             }
         )
-        
+
         data = response.json()
-        
+
         if not data.get("ok"):
             output = {
                 "status": "error",
@@ -108,7 +108,7 @@ def main():
             }
             json.dump(output, sys.stdout)
             return 1
-        
+
         # Return success
         output = {
             "status": "success",
@@ -119,7 +119,7 @@ def main():
         }
         json.dump(output, sys.stdout)
         return 0
-        
+
     except Exception as e:
         output = {
             "status": "error",

@@ -1,11 +1,11 @@
 name: Execute Actions
 
 # This workflow executes pending actions from daily files after PRs are merged
-# 
+#
 # NOTE: This is a FRAMEWORK repository. This workflow is provided as a template
 # for repositories that use this framework. It is disabled here by using
 # workflow_dispatch (manual trigger only).
-# 
+#
 # To use this in your repository:
 # 1. Copy this workflow to your .github/workflows/ directory
 # 2. Change the trigger from 'workflow_dispatch' to 'push' with appropriate paths
@@ -28,27 +28,27 @@ jobs:
   execute:
     runs-on: ubuntu-latest
     name: Execute Pending Actions
-    
+
     # Set permissions for the GitHub token to push commits
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           # Use a token that can trigger workflows
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-      
+
       - name: Execute actions
         id: execution
         env:
@@ -60,7 +60,7 @@ jobs:
           # JIRA_URL: ${{ secrets.JIRA_URL }}
         run: |
           PYTHONPATH=. python tools/action_executor.py --file "${{ github.event.inputs.file_pattern || 'actions/*.md' }}" --commit
-      
+
       - name: Execution summary
         if: always()
         run: |

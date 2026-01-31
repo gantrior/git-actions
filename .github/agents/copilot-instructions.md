@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-01-16
 
 ## Active Technologies
+- Python 3.9+ + PyYAML (>=6.0), jsonschema (>=4.17.0), requests (>=2.28.0) (002-ai-action-hooks)
+- Files (YAML for hook configurations, markdown for action audit trail) (002-ai-action-hooks)
 
 - Python 3.9+ + PyYAML (YAML parsing), jsonschema (schema validation), requests (HTTP for action scripts) (001-actions-markdown-framework)
 
@@ -65,6 +67,7 @@ ruff check tools/ scripts/
 Python 3.9+: Follow PEP 8, use type hints, small functions (≤15 lines per constitution)
 
 ## Recent Changes
+- 002-ai-action-hooks: Added Python 3.9+ + PyYAML (>=6.0), jsonschema (>=4.17.0), requests (>=2.28.0)
 
 - 001-actions-markdown-framework: Added Python 3.9+ + PyYAML (YAML parsing), jsonschema (schema validation), requests (HTTP for action scripts)
 

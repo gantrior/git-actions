@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gantrior/git-actions/schemas/hook-context.schema.json",
+  "title": "Hook Execution Context",
+  "description": "Schema for context data passed to hook scripts via stdin",
+  "type": "object",
+  "required": ["task_id", "task_type", "action_type", "action_status", "start_time", "input_parameters"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Identifier of the task from task management system",
+      "minLength": 1,
+      "examples": ["TASK-123", "PROJ-456"]
+    },
+    "task_type": {
+      "type": "string",
+      "description": "Type of task (matches action type)",
+      "minLength": 1,
+      "examples": ["jira_comment", "github_issue_update"]
+    },
+    "action_type": {
+      "type": "string",
+      "description": "Type of action that triggered the hook",
+      "minLength": 1
+    },
+    "action_status": {
+      "type": "string",
+      "description": "Current status of the action",
+      "enum": ["starting", "success", "failure", "timeout"]
+    },
+    "start_time": {
+      "type": "string",
+      "description": "When the action started (ISO 8601 format)",
+      "format": "date-time",
+      "examples": ["2026-01-19T11:07:24Z"]
+    },
+    "end_time": {
+      "type": "string",
+      "description": "When the action ended (only for after_* events)",
+      "format": "date-time",
+      "examples": ["2026-01-19T11:07:26Z"]
+    },
+    "input_parameters": {
+      "type": "object",
+      "description": "Parameters passed to the action",
+      "additionalProperties": true
+    },
+    "output_data": {
+      "type": "object",
+      "description": "Results from action execution (only for after_success)",
+      "additionalProperties": true
+    },
+    "error_details": {
+      "type": "object",
+      "description": "Error information (only for after_failure)",
+      "properties": {
+        "error_type": {
+          "type": "string",
+          "description": "Classification of error"
+        },
+        "error_message": {
+          "type": "string",
+          "description": "Human-readable error description"
+        },
+        "stack_trace": {
+          "type": "string",
+          "description": "Full stack trace if available"
+        }
+      },
+      "required": ["error_type", "error_message"],
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional context (e.g., PR number, commit SHA, user)",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "pr_number": 42,
+          "commit_sha": "abc123def456",
+          "user": "ai-assistant",
+          "branch": "feature/new-feature"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action_status": {
+            "const": "success"
+          }
+        }
+      },
+      "then": {
+        "required": ["output_data"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action_status": {
+            "const": "failure"
+          }
+        }
+      },
+      "then": {
+        "required": ["error_details"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action_status": {
+            "enum": ["success", "failure", "timeout"]
+          }
+        }
+      },
+      "then": {
+        "required": ["end_time"]
+      }
+    }
+  ]
+}

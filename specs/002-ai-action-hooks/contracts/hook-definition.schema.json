@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gantrior/git-actions/schemas/hook-definition.schema.json",
+  "title": "Hook Definition",
+  "description": "Schema for hook configuration in actions/hooks.yaml",
+  "type": "object",
+  "required": ["hooks"],
+  "properties": {
+    "hooks": {
+      "type": "array",
+      "description": "List of hook definitions",
+      "items": {
+        "$ref": "#/definitions/hook"
+      }
+    }
+  },
+  "definitions": {
+    "hook": {
+      "type": "object",
+      "required": ["id", "lifecycle_event", "execution_mode", "execution_order", "enabled", "script_path"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the hook",
+          "pattern": "^[a-z0-9_]+$",
+          "minLength": 1,
+          "maxLength": 100,
+          "examples": ["update_jira_status", "send_slack_notification"]
+        },
+        "lifecycle_event": {
+          "type": "string",
+          "description": "Action lifecycle event that triggers this hook",
+          "enum": ["before_execute", "after_success", "after_failure", "after_timeout"]
+        },
+        "task_type_filter": {
+          "type": "array",
+          "description": "Action types this hook applies to (empty = all types)",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "execution_mode": {
+          "type": "string",
+          "description": "Whether hook executes synchronously (blocks action) or asynchronously",
+          "enum": ["sync", "async"]
+        },
+        "execution_order": {
+          "type": "integer",
+          "description": "Execution priority (1 = first, higher numbers execute later)",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether this hook is currently active"
+        },
+        "script_path": {
+          "type": "string",
+          "description": "Path to hook script relative to repository root",
+          "pattern": "^[a-zA-Z0-9_/.-]+$",
+          "examples": ["scripts/hooks/update_jira.py", "scripts/hooks/notify_slack.sh"]
+        },
+        "config": {
+          "type": "object",
+          "description": "Hook-specific configuration passed to script",
+          "additionalProperties": true
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "description": "Maximum execution time for sync hooks",
+          "minimum": 1,
+          "maximum": 300,
+          "default": 30
+        },
+        "retry_count": {
+          "type": "integer",
+          "description": "Number of retry attempts on failure",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 3
+        },
+        "retry_backoff_seconds": {
+          "type": "integer",
+          "description": "Initial backoff delay for retries (exponential)",
+          "minimum": 1,
+          "maximum": 60,
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
