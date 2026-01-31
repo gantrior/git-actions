@@ -39,8 +39,10 @@ ignore = [
     "B008",   # Function call in default argument (common in dataclasses)
     "B904",   # Within except, raise with `from err` (requires larger refactor)
     "SIM108", # Use ternary operator (can reduce readability)
-    "UP006",  # Use `dict` instead of `Dict` (requires Python 3.9+ typing style migration)
-    "UP035",  # `typing.Dict` is deprecated (requires Python 3.9+ typing style migration)
+    # TODO: Remove UP006/UP035 ignores after migrating to PEP 585 type hints (dict instead of Dict)
+    # Note: Python 3.9+ supports this, but existing code uses old-style hints
+    "UP006",  # Use `dict` instead of `Dict` for type annotation
+    "UP035",  # `typing.Dict` is deprecated, use `dict` instead
     "F841",   # Local variable assigned but never used (some intentional patterns)
 ]
 
