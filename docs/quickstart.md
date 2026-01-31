@@ -3,18 +3,27 @@
 **Feature**: 001-actions-markdown-framework  
 **Audience**: Developers and AI assistants proposing actions
 
-> **New to the framework?** See the [Installation Guide](installation.md) first to set up the framework in your repository.
+> **New to the framework?** See the
+> [Installation Guide](installation.md) first to set up the framework in your
+> repository.
 
 ---
 
 ## What is this?
 
-The Actions-as-Markdown Framework lets you propose automated actions (like posting Jira comments, updating docs, etc.) as reviewable PRs by editing markdown files. No action executes until the PR is merged to `main`. After execution, results are committed back inline for a complete audit trail.
+The Actions-as-Markdown Framework lets you propose automated actions (like
+posting Jira comments, updating docs, etc.) as reviewable PRs by editing
+markdown files. No action executes until the PR is merged to `main`. After
+execution, results are committed back inline for a complete audit trail.
 
 **Key benefits**:
+
 - ✅ Actions are human-readable markdown (not JSON or YAML config)
+
 - ✅ Safe: PR validation catches errors before execution
+
 - ✅ Auditable: All actions and results in git history
+
 - ✅ Simple: No external database or complex infrastructure
 
 ---
@@ -29,7 +38,8 @@ Create or edit `actions/2026-01-15.md`:
 # Actions for 2026-01-15
 
 - [ ] `a1` — *jira-comment* v1.0
-```yaml
+
+\\```yaml
 inputs:
   ticket: PROJ-123
   comment: |
@@ -37,7 +47,8 @@ inputs:
     Root cause was incorrect session timeout.
 outputs: {}
 meta: {}
-```
+\```
+
 ```
 
 **What this does**: When merged, posts a comment to Jira ticket `PROJ-123`.
@@ -46,26 +57,35 @@ meta: {}
 
 The PR workflow:
 - ✅ Checks action format is correct
+
 - ✅ Verifies `jira-comment` exists in allowlist
+
 - ✅ Validates inputs match schema (ticket ID pattern, comment not empty)
+
 - ❌ Does NOT execute the action (safe for review)
 
 ### 3. Human reviews PR
 
 Reviewer sees:
 - Exactly what action will execute
+
 - Clear inputs (ticket ID, comment text)
+
 - Action type and version
 
 ### 4. Merge to main
 
 Action executes automatically:
+
 - Script `scripts/jira-comment.py` runs with inputs
+
 - Result captured and committed back:
 
 ```markdown
+
 - [x] `a1` — *jira-comment* v1.0
-```yaml
+
+\\```yaml
 inputs:
   ticket: PROJ-123
   comment: |
@@ -77,7 +97,12 @@ outputs:
 meta:
   executedAt: "2026-01-15T14:32:11Z"
   runId: "1234567890"
+\```
+
 ```
+
+```text
+
 ```
 
 ---
@@ -103,6 +128,7 @@ tools/
   editor.py
   validator.py
   executor.py
+
 ```
 
 ---
@@ -112,21 +138,30 @@ tools/
 Every action follows this structure:
 
 ```markdown
+
 - [ ] `{action-id}` — *{action-name}* v{version}
-```yaml
+
+\```yaml
 inputs:
   {key}: {value}
 outputs: {}
 meta: {}
-```
+
+```text
+
 ```
 
 **Field explanations**:
 - `action-id`: Unique within the daily file (e.g., `a1`, `jira-001`)
+
 - `action-name`: Type of action (must be in allowlist)
+
 - `version`: Action script version (must match allowlist)
+
 - `inputs`: Parameters for the action (validated by schema)
+
 - `outputs`: Empty until executed, then populated with results
+
 - `meta`: Empty until executed, then populated with timestamp and run ID
 
 ---
@@ -135,9 +170,11 @@ meta: {}
 
 ### Step 1: Choose the right daily file
 
-**Rule**: Actions go in `actions/YYYY-MM-DD.md` where date is the day you propose them.
+**Rule**: Actions go in `actions/YYYY-MM-DD.md` where date is the day you
+propose them.
 
 **Examples**:
+
 - Today is 2026-01-15 → Use `actions/2026-01-15.md`
 - Planning for tomorrow → Use `actions/2026-01-16.md`
 
@@ -149,13 +186,14 @@ meta: {}
 Daily actions log. Actions are executed when merged to main.
 
 (actions go below)
+
 ```
 
 ### Step 2: Pick an action type
 
 Check `actions/allowlist.yaml` for available actions:
 
-```yaml
+\```yaml
 jira-comment:
   script: "scripts/jira-comment.py"
   version: "1.0"
@@ -169,7 +207,8 @@ confluence-comment:
   schema: "schemas/confluence-comment.json"
   timeout: 60
   environment: "any"
-```
+
+```yaml
 
 **Action not in allowlist?** See "Adding New Action Types" below.
 
@@ -197,6 +236,7 @@ Look at `schemas/{action-name}.json` to see required inputs.
     }
   }
 }
+
 ```
 
 **Required fields**: `ticket`, `comment`  
@@ -205,20 +245,27 @@ Look at `schemas/{action-name}.json` to see required inputs.
 ### Step 4: Write the action entry
 
 ```markdown
+
 - [ ] `a1` — *jira-comment* v1.0
-```yaml
+
+\```yaml
 inputs:
   ticket: PROJ-123
   comment: "Fixed the bug"
 outputs: {}
 meta: {}
-```
+
+```text
+
 ```
 
 **Tips**:
 - Use unique `action-id` (check file for existing IDs)
+
 - Match `version` exactly from allowlist
+
 - For multiline text, use YAML literal block:
+
   ```yaml
   inputs:
     comment: |
@@ -234,6 +281,7 @@ git checkout -b add-jira-comment-action
 git add actions/2026-01-15.md
 git commit -m "Add Jira comment action for PROJ-123"
 git push origin add-jira-comment-action
+
 ```
 
 Create PR on GitHub. The validation workflow will run automatically.
@@ -243,32 +291,45 @@ Create PR on GitHub. The validation workflow will run automatically.
 **Common errors**:
 
 ❌ **Action not in allowlist**:
-```
+
+```text
 ERROR: Action 'jira-coment' not found in allowlist (typo?)
+
 ```
+
 **Fix**: Check spelling of action name
 
 ❌ **Version mismatch**:
+
+```text
+ERROR: Action 'jira-comment' version mismatch: action has v2.0,
+allowlist expects v1.0
 ```
-ERROR: Action 'jira-comment' version mismatch: action has v2.0, allowlist expects v1.0
-```
+
 **Fix**: Change `v2.0` to `v1.0` in action entry
 
 ❌ **Missing required field**:
-```
+
+```text
 ERROR: Action 'jira-comment' inputs invalid: 'ticket' is a required property
+
 ```
+
 **Fix**: Add `ticket` field to inputs
 
 ❌ **Invalid field value**:
-```
+
+```text
 ERROR: Action 'jira-comment' inputs invalid: 'PROJ_123' does not match pattern '^[A-Z]+-[0-9]+$'
+
 ```
+
 **Fix**: Use hyphen instead of underscore: `PROJ-123`
 
 ### Step 7: Merge PR
 
-Once validation passes and reviewer approves, merge to `main`. The execution workflow runs automatically and commits results back.
+Once validation passes and reviewer approves, merge to `main`. The execution
+workflow runs automatically and commits results back.
 
 ---
 
@@ -278,16 +339,21 @@ Once validation passes and reviewer approves, merge to `main`. The execution wor
 
 ```bash
 git log --oneline actions/2026-01-15.md
+
 ```
 
 You'll see commits like:
-```
+
+```text
 abc123d Execute action a1 [skip ci]
+
 ```
 
 View the commit:
+
 ```bash
 git show abc123d
+
 ```
 
 ### Option 2: View the File Directly
@@ -295,8 +361,10 @@ git show abc123d
 Open `actions/2026-01-15.md` and look for `[x]` checkboxes:
 
 ```markdown
+
 - [x] `a1` — *jira-comment* v1.0
-```yaml
+
+\```yaml
 inputs:
   ticket: PROJ-123
   comment: "Fixed the bug"
@@ -306,19 +374,27 @@ outputs:
 meta:
   executedAt: "2026-01-15T14:32:11Z"
   runId: "1234567890"
-```
+
+```text
+
 ```
 
 **Success indicators**:
 - `[x]` checkbox is checked
+
 - `outputs` field populated
+
 - `meta.executedAt` timestamp present
+
 - No `meta.error` field
 
 **Failure indicators**:
 - `[x]` checkbox is checked (action was attempted)
+
 - `outputs` is empty: `{}`
+
 - `meta.error` field present:
+
   ```yaml
   meta:
     executedAt: "2026-01-15T14:32:45Z"
@@ -334,12 +410,17 @@ meta:
 
 **Check**:
 1. Is checkbox still unchecked `[ ]`?
+
    - View GitHub Actions workflow runs
+
    - Look for "Execute Actions" workflow
+
    - Check logs for errors
 
 2. Was action skipped due to environment?
+
    - Check `meta.skipped` field:
+
      ```yaml
      meta:
        skipped: true
@@ -350,33 +431,48 @@ meta:
 
 **Check**:
 1. View GitHub Actions workflow run for PR
+
 2. Look at "Validate Action Proposals" job
+
 3. Read error output (includes line numbers)
 
 **Common causes**:
 - Malformed YAML (indentation, missing colon)
+
 - Action ID has spaces or special characters
+
 - Version format wrong (needs `v1.0` not `1.0`)
 
 ### I need to re-run a failed action
 
 **Option 1: Re-propose** (recommended)
+
 - Create new action entry with different ID:
+
   ```markdown
+
   - [ ] `a1-retry` — *jira-comment* v1.0
-  ```
+
+```markdown
 
 **Option 2: Manual edit** (advanced)
+
 - Manually uncheck the failed action (change `[x]` to `[ ]`)
+
 - Remove `outputs` and `meta` (reset to `{}`)
+
 - Create PR with changes
+
 - **Warning**: Validation will reject this in PR mode due to immutability check
 
 ---
 
 ## Adding New Action Types
 
-**Action not in allowlist?** See the [Installation Guide](installation.md#step-4-create-your-first-custom-action) for a complete example, or the [Adding Actions Guide](adding-actions.md) for detailed instructions on creating custom action types.
+**Action not in allowlist?** See the
+[Installation Guide](installation.md#step-4-create-your-first-custom-action)
+for a complete example, or the [Adding Actions Guide](adding-actions.md) for
+detailed instructions on creating custom action types.
 
 ---
 
@@ -385,12 +481,18 @@ meta:
 ### ✅ DO
 
 - Use descriptive action IDs (`jira-proj123`, not just `a1`)
+
 - Write clear, detailed input values (helps reviewers)
+
 - Check allowlist before proposing (avoid typos)
+
 - Review your own PR before requesting review
+
 - Add actions to the current day's file (not past dates)
+
 - Use multiline YAML for long text:
-  ```yaml
+
+  \```yaml
   comment: |
     Line 1
     Line 2
@@ -399,9 +501,13 @@ meta:
 ### ❌ DON'T
 
 - Don't modify checked actions (`[x]`) - they're immutable
+
 - Don't put secrets in markdown files (they go in environment variables)
+
 - Don't reuse action IDs within same daily file
+
 - Don't skip `outputs: {}` and `meta: {}` fields (required even when empty)
+
 - Don't use version `1.0` when allowlist says `v1.0` (include the `v`)
 
 ---
@@ -411,27 +517,35 @@ meta:
 ### Jira Comment
 
 ```markdown
+
 - [ ] `a1` — *jira-comment* v1.0
-```yaml
+
+\```yaml
 inputs:
   ticket: PROJ-123
   comment: "Status update"
 outputs: {}
 meta: {}
-```
+
+```text
+
 ```
 
 ### Confluence Comment
 
 ```markdown
+
 - [ ] `a2` — *confluence-comment* v1.0
-```yaml
+
+\```yaml
 inputs:
   pageId: "98765"
   comment: "Updated documentation"
 outputs: {}
 meta: {}
-```
+
+```text
+
 ```
 
 ---
@@ -439,8 +553,11 @@ meta: {}
 ## Next Steps
 
 1. **Explore existing actions**: Check `actions/allowlist.yaml`
+
 2. **Review past actions**: Browse `actions/` directory
+
 3. **Propose your first action**: Follow the quickstart above
+
 4. **Add new action types**: See "Adding New Action Types" section
 
 ---
@@ -448,10 +565,13 @@ meta: {}
 ## Getting Help
 
 - **Schema validation errors**: Check `schemas/{action-name}.json` for requirements
+
 - **Execution failures**: Check `meta.error` field in action entry
+
 - **Workflow issues**: View GitHub Actions logs in repository
+
 - **Questions**: Ask in repository discussions or create an issue
 
 ---
 
-**Happy automating! 🚀**
+Happy automating! 🚀

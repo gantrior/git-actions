@@ -1,15 +1,22 @@
 # Installation Guide: Actions-as-Markdown Framework
 
-This guide explains how to install and configure the Actions-as-Markdown Framework in your repository.
+This guide explains how to install and configure the
+Actions-as-Markdown Framework in your repository.
 
 ---
 
 ## Overview
 
-The Actions-as-Markdown Framework is designed to be installed in your repository as a git submodule. This allows you to easily update to new framework versions by updating the submodule reference. Once installed, you can define custom actions specific to your needs and propose/execute them through pull requests.
+The Actions-as-Markdown Framework is designed to be installed in your
+repository as a git submodule. This allows you to easily update to new
+framework versions by updating the submodule reference. Once installed, you
+can define custom actions specific to your needs and propose/execute them
+through pull requests.
 
 **Benefits of submodule installation:**
-- Easy updates: Pull new framework versions with a simple `git submodule update`
+
+- Easy updates: Pull new framework versions with a simple
+  `git submodule update`
 - Version control: Pin to specific framework versions or tags
 - Separation: Framework code stays separate from your custom actions
 - No duplication: Share the same framework code across multiple repositories
@@ -28,14 +35,16 @@ The Actions-as-Markdown Framework is designed to be installed in your repository
 
 ### Step 1: Add Framework as Git Submodule (Recommended)
 
-Adding the framework as a git submodule allows you to easily update to new versions by updating the submodule reference.
+Adding the framework as a git submodule allows you to easily update to new
+versions by updating the submodule reference.
 
 ```bash
 # Navigate to your repository
 cd /path/to/your-repo
 
 # Add the framework as a submodule
-git submodule add https://github.com/gantrior/git-actions.git .github/actions-framework
+git submodule add https://github.com/gantrior/git-actions.git \
+  .github/actions-framework
 
 # Initialize and update the submodule
 git submodule update --init --recursive
@@ -68,13 +77,15 @@ git add .github/actions-framework
 git commit -m "Update actions-framework to v0.0.3"
 ```
 
-**Alternative: Copy Framework Files (Not Recommended)**
+#### Alternative: Copy Framework Files (Not Recommended)
 
-If you prefer not to use submodules, you can copy the framework files directly:
+If you prefer not to use submodules, you can copy the framework files
+directly:
 
 ```bash
 # Clone the framework repository
-git clone https://github.com/gantrior/git-actions.git /tmp/actions-framework
+git clone https://github.com/gantrior/git-actions.git \
+  /tmp/actions-framework
 
 # Copy framework files to your repository
 cp -r /tmp/actions-framework/tools/ /path/to/your-repo/
@@ -84,7 +95,8 @@ cp /tmp/actions-framework/requirements.txt /path/to/your-repo/
 rm -rf /tmp/actions-framework
 ```
 
-**Note**: With this approach, you'll need to manually update files when new framework versions are released.
+**Note**: With this approach, you'll need to manually update files when new
+framework versions are released.
 
 **After installation, your repository structure will be:**
 
@@ -111,7 +123,8 @@ your-repo/
 
 ### Step 2: Set Up GitHub Actions Workflows
 
-Create two workflow files in your repository's `.github/workflows/` directory. These workflows reference the framework tools from the submodule.
+Create two workflow files in your repository's `.github/workflows/` directory.
+These workflows reference the framework tools from the submodule.
 
 #### PR Validation Workflow
 
@@ -131,30 +144,32 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     name: Validate Action Files
-    
+
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: recursive  # Important: checkout submodules
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: |
           pip install -r .github/actions-framework/requirements.txt
-      
+
       - name: Validate action files
         id: validation
         run: |
-          PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/pr_validator.py --file "actions/*.md"
-      
+          PYTHONPATH=.github/actions-framework \
+            python .github/actions-framework/tools/pr_validator.py \
+            --file "actions/*.md"
+
       - name: Validation summary
         if: always()
         run: |
@@ -189,26 +204,26 @@ jobs:
   execute:
     runs-on: ubuntu-latest
     name: Execute Pending Actions
-    
+
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: recursive  # Important: checkout submodules
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      
+
       - name: Install dependencies
         run: |
           pip install -r .github/actions-framework/requirements.txt
-      
+
       - name: Execute actions
         id: execution
         env:
@@ -218,8 +233,10 @@ jobs:
           # JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           # SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
-          PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/action_executor.py --file "actions/*.md" --commit
-      
+          PYTHONPATH=.github/actions-framework \
+            python .github/actions-framework/tools/action_executor.py \
+            --file "actions/*.md" --commit
+
       - name: Execution summary
         if: always()
         run: |
@@ -233,7 +250,9 @@ jobs:
 
 ### Step 3: Configure Branch Protection (Important!)
 
-The framework commits action results back to the `main` branch. You need to configure branch protection to allow the GitHub Actions bot to push commits while still protecting your branch.
+The framework commits action results back to the `main` branch. You need to
+configure branch protection to allow the GitHub Actions bot to push commits
+while still protecting your branch.
 
 #### Option 1: Allow GitHub Actions to bypass protection (Recommended)
 
@@ -249,17 +268,22 @@ The framework commits action results back to the `main` branch. You need to conf
      - Add `github-actions[bot]` to the list
 4. Click **Create** or **Save changes**
 
-**Why this works**: This allows the execution workflow to commit results directly to `main` after actions execute, while still requiring PRs for all human-initiated changes.
+**Why this works**: This allows the execution workflow to commit results
+directly to `main` after actions execute, while still requiring PRs for all
+human-initiated changes.
 
 #### Option 2: Use a Personal Access Token (PAT)
 
-If you prefer not to bypass protection rules, use a PAT with appropriate permissions:
+If you prefer not to bypass protection rules, use a PAT with appropriate
+permissions:
 
 1. Create a Personal Access Token (classic) with `repo` scope
-2. Add it as a repository secret: **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
+2. Add it as a repository secret: **Settings** → **Secrets and variables** →
+   **Actions** → **New repository secret**
    - Name: `PAT_TOKEN`
    - Value: Your PAT
 3. Update `.github/workflows/execute-actions.yml`:
+
    ```yaml
    - name: Checkout code
      uses: actions/checkout@v4
@@ -279,7 +303,8 @@ If you want to keep `main` fully protected:
 
 ### Step 4: Create Your First Custom Action
 
-Create a custom action type specific to your needs. Here's an example for posting Slack messages:
+Create a custom action type specific to your needs. Here's an example for
+posting Slack messages:
 
 #### 4.1 Create the JSON Schema
 
@@ -289,17 +314,17 @@ Create `schemas/slack-message.json`:
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["message"],
+  "required": ["channel", "message"],
   "properties": {
+    "channel": {
+      "type": "string",
+      "pattern": "^#[a-z0-9-]+$",
+      "description": "Slack channel name (e.g., #general)"
+    },
     "message": {
       "type": "string",
       "minLength": 1,
       "description": "Message text to post to Slack"
-    },
-    "channel": {
-      "type": "string",
-      "pattern": "^#[a-z0-9-]+$",
-      "description": "Slack channel (default: #general)"
     }
   },
   "additionalProperties": false
@@ -410,7 +435,9 @@ Update `.github/workflows/execute-actions.yml` to include the secret:
     GITHUB_RUN_ID: ${{ github.run_id }}
     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}  # Add this line
   run: |
-    PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/action_executor.py --file "actions/*.md" --commit
+    PYTHONPATH=.github/actions-framework \
+      python .github/actions-framework/tools/action_executor.py \
+      --file "actions/*.md" --commit
 ```
 
 ### Step 5: Test Your Installation
@@ -427,6 +454,7 @@ Create `actions/2026-01-16.md`:
 Daily actions log. Actions are executed when merged to main.
 
 - [ ] `test-1` — *slack-message* v1.0
+
 ```yaml
 inputs:
   message: "Hello from Actions-as-Markdown Framework!"
@@ -434,7 +462,8 @@ inputs:
 outputs: {}
 meta: {}
 ```
-```
+
+```markdown
 
 #### 5.2 Test Validation Locally
 
@@ -443,11 +472,14 @@ meta: {}
 pip install -r .github/actions-framework/requirements.txt
 
 # Validate the action file
-PYTHONPATH=.github/actions-framework python .github/actions-framework/tools/pr_validator.py --file actions/2026-01-16.md
+PYTHONPATH=.github/actions-framework \
+  python .github/actions-framework/tools/pr_validator.py \
+  --file actions/2026-01-16.md
 ```
 
 You should see output like:
-```
+
+```text
 ✅ All action files are valid
 ```
 
@@ -460,11 +492,13 @@ git commit -m "Add test Slack message action"
 git push origin test-slack-action
 ```
 
-Create a PR on GitHub. The PR validation workflow should run automatically and pass.
+Create a PR on GitHub. The PR validation workflow should run automatically
+and pass.
 
 #### 5.4 Merge and Verify Execution
 
 Merge the PR to `main`. The execution workflow should:
+
 1. Execute the action
 2. Post the message to Slack
 3. Commit the results back to the action file
@@ -473,6 +507,7 @@ Check the updated file to see the execution results:
 
 ```markdown
 - [x] `test-1` — *slack-message* v1.0
+
 ```yaml
 inputs:
   message: "Hello from Actions-as-Markdown Framework!"
@@ -484,17 +519,19 @@ meta:
   executedAt: "2026-01-16T14:32:11Z"
   runId: "1234567890"
 ```
-```
+
+```markdown
 
 ---
 
-## Troubleshooting
+### Troubleshooting
 
 ### Workflow doesn't trigger
 
 **Problem**: PR validation or execution workflow doesn't run.
 
 **Solutions**:
+
 - Verify workflow files are in `.github/workflows/` directory
 - Check that action files are in `actions/` directory with `.md` extension
 - Ensure branch protection rules don't block the workflows
@@ -502,9 +539,11 @@ meta:
 
 ### Execution workflow can't push commits
 
-**Problem**: Execution workflow fails with permission error when trying to commit results.
+**Problem**: Execution workflow fails with permission error when trying to
+commit results.
 
 **Solutions**:
+
 - Follow Step 3 to configure branch protection correctly
 - Verify the workflow has `contents: write` permission
 - Check that `github-actions[bot]` is allowed to bypass PR requirements
@@ -515,6 +554,7 @@ meta:
 **Problem**: Action executes but script returns an error.
 
 **Solutions**:
+
 - Verify script has execute permissions: `chmod +x scripts/your-script.py`
 - Check environment variables are configured as secrets
 - Review script logs in GitHub Actions workflow run
@@ -526,6 +566,7 @@ meta:
 **Problem**: PR validation fails with schema errors.
 
 **Solutions**:
+
 - Verify JSON schema syntax is correct
 - Check that inputs match schema requirements
 - Ensure action name in allowlist matches action entry exactly
@@ -536,9 +577,11 @@ meta:
 **Problem**: Workflow fails with "submodule not found" or similar errors.
 
 **Solutions**:
+
 - Verify submodule was added correctly: `git submodule status`
 - Ensure workflow has `submodules: recursive` in checkout step
-- Try initializing submodule manually: `git submodule update --init --recursive`
+- Try initializing submodule manually:
+  `git submodule update --init --recursive`
 - Check `.gitmodules` file exists and has correct URL
 
 ---
@@ -552,39 +595,43 @@ your-repo/
 ├── .github/
 │   ├── actions-framework/          # Git submodule (framework code)
 │   │   ├── tools/
-│   │   │   ├── parser.py           # Framework core - parses action files
-│   │   │   ├── editor.py           # Framework core - edits action files
-│   │   │   ├── validator.py        # Framework core - validates actions
-│   │   │   ├── executor.py         # Framework core - executes actions
+│   │   │   ├── parser.py           # Framework core - parses files
+│   │   │   ├── editor.py           # Framework core - edits files
+│   │   │   ├── validator.py        # Framework core - validates
+│   │   │   ├── executor.py         # Framework core - executes
 │   │   │   ├── pr_validator.py     # CLI tool for PR validation
-│   │   │   └── action_executor.py  # CLI tool for action execution
-│   │   └── requirements.txt        # Python dependencies for framework
+│   │   │   └── action_executor.py  # CLI tool for execution
+│   │   └── requirements.txt        # Python dependencies
 │   └── workflows/
-│       ├── pr-validation.yml       # Validates PRs with action changes
-│       └── execute-actions.yml     # Executes actions on merge to main
+│       ├── pr-validation.yml       # Validates PRs with changes
+│       └── execute-actions.yml     # Executes on merge to main
 ├── actions/
-│   ├── allowlist.yaml              # Registry of allowed action types
-│   └── YYYY-MM-DD.md               # Daily action files (created as needed)
+│   ├── allowlist.yaml              # Registry of allowed actions
+│   └── YYYY-MM-DD.md               # Daily action files
 ├── schemas/
-│   └── your-action.json            # JSON schemas for your custom actions
+│   └── your-action.json            # JSON schemas for actions
 ├── scripts/
 │   └── your-action.py              # Your custom action scripts
 ├── .gitmodules                     # Git submodule configuration
 └── README.md                       # Your repository documentation
 ```
 
-**Note**: The `tools/` directory and `requirements.txt` are in the submodule, not your main repository.
+**Note**: The `tools/` directory and `requirements.txt` are in the submodule,
+not your main repository.
 
 ---
 
 ## Next Steps
 
-1. **Read the [Quickstart Guide](quickstart.md)** to learn how to use the framework
-2. **Create custom actions** for your specific needs (see [Adding Actions](adding-actions.md))
+1. **Read the [Quickstart Guide](quickstart.md)** to learn how to use the
+   framework
+2. **Create custom actions** for your specific needs (see
+   [Adding Actions](adding-actions.md))
 3. **Configure additional secrets** for your action scripts
 4. **Customize workflows** if you need different behavior
 5. **Review past actions** by browsing the `actions/` directory
-6. **Update the framework** periodically by updating the submodule to get new features and fixes
+6. **Update the framework** periodically by updating the submodule to get new
+   features and fixes
 
 ---
 
@@ -593,8 +640,9 @@ your-repo/
 - **Installation issues**: Check the Troubleshooting section above
 - **Usage questions**: See the [Quickstart Guide](quickstart.md)
 - **Adding custom actions**: See [Adding Actions Guide](adding-actions.md)
-- **Technical details**: See the [Implementation Plan](../specs/001-actions-markdown-framework/plan.md)
+- **Technical details**: See the
+  [Implementation Plan](../specs/001-actions-markdown-framework/plan.md)
 
 ---
 
-**Happy automating! 🚀**
+Happy automating! 🚀
