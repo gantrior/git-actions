@@ -7,7 +7,14 @@ on:
       - 'memory/**'
       - 'scripts/**'
       - 'templates/**'
+      - 'tools/**'
+      - 'tests/**'
+      - 'docs/**'
+      - 'actions/**'
       - '.github/workflows/**'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+      - 'README.md'
   workflow_dispatch:
 
 jobs:
