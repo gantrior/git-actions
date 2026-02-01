@@ -4,17 +4,15 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'memory/**'
-      - 'scripts/**'
-      - 'templates/**'
+      # Core framework code
       - 'tools/**'
-      - 'tests/**'
-      - 'docs/**'
+      - 'scripts/**'
       - 'actions/**'
-      - '.github/workflows/**'
+      # Project configuration
       - 'pyproject.toml'
       - 'requirements.txt'
-      - 'README.md'
+      # CI/CD workflows
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
