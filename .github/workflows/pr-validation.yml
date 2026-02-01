@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for git diff against base branch
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -43,7 +45,7 @@ jobs:
       - name: Validate action files
         id: validation
         run: |
-          PYTHONPATH=. python tools/pr_validator.py --file "actions/*.md"
+          PYTHONPATH=. python tools/pr_validator.py --file "actions/*.md" --base-ref origin/${{ github.base_ref }}
 
       - name: Validation summary
         if: always()
