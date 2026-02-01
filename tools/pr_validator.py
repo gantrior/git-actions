@@ -16,11 +16,13 @@ import glob
 import os
 import subprocess
 import sys
+from typing import Optional, Set
 
+from tools.parser import parse_daily_file
 from tools.validator import validate_daily_file
 
 
-def get_changed_files(base_ref: str) -> set:
+def get_changed_files(base_ref: str) -> Set[str]:
     """Get list of files changed compared to base ref.
 
     Args:
@@ -40,6 +42,97 @@ def get_changed_files(base_ref: str) -> set:
     except subprocess.CalledProcessError as e:
         print(f"⚠️  Warning: Could not get changed files from git: {e}")
         return set()
+
+
+def get_file_content_from_ref(file_path: str, ref: str) -> Optional[str]:
+    """Get the content of a file at a specific git ref.
+
+    Args:
+        file_path: Path to the file
+        ref: Git reference (e.g., 'origin/main')
+
+    Returns:
+        File content as string, or None if file doesn't exist at that ref
+    """
+    try:
+        result = subprocess.run(
+            ["git", "show", f"{ref}:{file_path}"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return result.stdout
+    except subprocess.CalledProcessError:
+        # File doesn't exist at that ref (new file)
+        return None
+
+
+def get_checked_actions_modified(file_path: str, base_ref: str) -> Set[str]:
+    """Get the IDs of checked actions that were modified in the PR.
+
+    Compares the current file content with the base ref to determine
+    which checked actions have been modified. Only returns IDs of actions
+    that are checked AND have different content from the base.
+
+    Args:
+        file_path: Path to the file to check
+        base_ref: Git reference to compare against
+
+    Returns:
+        Set of action IDs that are checked and were modified
+    """
+    # Get base content
+    base_content = get_file_content_from_ref(file_path, base_ref)
+    if base_content is None:
+        # File is new, so no checked actions could have been modified
+        return set()
+
+    # Read current content
+    try:
+        with open(file_path) as f:
+            current_content = f.read()
+    except FileNotFoundError:
+        return set()
+
+    # Parse actions from both versions
+    try:
+        base_actions = parse_daily_file(base_content, filename=file_path)
+        current_actions = parse_daily_file(current_content, filename=file_path)
+    except Exception:
+        # If parsing fails, fall back to conservative behavior
+        return set()
+
+    # Build map of base actions by ID
+    base_actions_map = {}
+    for action in base_actions:
+        base_actions_map[action.id] = action
+
+    # Find checked actions that were modified
+    modified_checked = set()
+    for action in current_actions:
+        if not action.is_checked:
+            continue
+
+        # Get base version of this action
+        base_action = base_actions_map.get(action.id)
+        if base_action is None:
+            # Action is checked but didn't exist in base - this is suspicious
+            # (how can a new action already be checked?)
+            modified_checked.add(action.id)
+            continue
+
+        # Compare action content (inputs, outputs, meta)
+        # Note: We compare the serialized forms to detect any changes
+        if (
+            action.inputs != base_action.inputs
+            or action.outputs != base_action.outputs
+            or action.meta != base_action.meta
+            or action.name != base_action.name
+            or action.version != base_action.version
+        ):
+            modified_checked.add(action.id)
+
+    return modified_checked
 
 
 def main():
@@ -98,13 +191,21 @@ def main():
 
         print(f"\n📋 Validating: {file_path}")
 
-        # Determine if file was changed (for immutability check)
-        # If no base ref provided, assume all files are changed (strict mode)
+        # Determine which checked actions were modified (for immutability check)
+        # If no base ref provided, use legacy file_changed behavior (strict mode)
+        modified_checked_actions = None
         file_changed = True
-        if changed_files is not None:
-            file_changed = file_path in changed_files
-            if not file_changed:
-                print("   ℹ️  File not modified in PR, skipping immutability check")
+
+        if args.base_ref:
+            # Use content-based comparison for precise immutability checking
+            modified_checked_actions = get_checked_actions_modified(file_path, args.base_ref)
+            if modified_checked_actions:
+                print(f"   ⚠️  Checked actions modified: {modified_checked_actions}")
+            else:
+                print("   ℹ️  No checked actions were modified")
+            # file_changed is still needed for backward compatibility
+            if changed_files is not None:
+                file_changed = file_path in changed_files
 
         try:
             result = validate_daily_file(
@@ -113,6 +214,7 @@ def main():
                 schemas_dir=args.schemas,
                 mode="pr",  # Strict PR mode
                 file_changed=file_changed,
+                modified_checked_actions=modified_checked_actions,
             )
 
             if result.is_valid:

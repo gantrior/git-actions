@@ -272,6 +272,7 @@ def validate_daily_file(
     schemas_dir: str,
     mode: str = "pr",
     file_changed: bool = True,
+    modified_checked_actions: Optional[set] = None,
 ) -> ValidationResult:
     """Validate all actions in a daily file.
 
@@ -283,6 +284,10 @@ def validate_daily_file(
         file_changed: Whether the file was modified in the PR. If False,
             immutability checks are skipped for checked actions since
             unchanged files should not trigger immutability errors.
+        modified_checked_actions: Set of action IDs that are checked and
+            were modified compared to the base branch. If provided, only
+            these actions will trigger immutability errors. If None,
+            falls back to file_changed behavior for backward compatibility.
 
     Returns:
         ValidationResult object with validation status and errors
@@ -398,16 +403,27 @@ def validate_daily_file(
                 )
             )
 
-        # Check immutability in PR mode (only for files that were actually changed)
-        if mode == "pr" and action.is_checked and file_changed:
-            errors.append(
-                ValidationError(
-                    action_id=action.id,
-                    error_type="immutability",
-                    message="Cannot modify checked actions in PR. Checked actions are immutable.",
-                    line_number=action.line_number,
+        # Check immutability in PR mode
+        # If modified_checked_actions is provided, only flag actions in that set
+        # Otherwise, fall back to file_changed behavior for backward compatibility
+        if mode == "pr" and action.is_checked:
+            should_flag = False
+            if modified_checked_actions is not None:
+                # New behavior: only flag if this action was actually modified
+                should_flag = action.id in modified_checked_actions
+            elif file_changed:
+                # Legacy behavior: flag all checked actions in changed files
+                should_flag = True
+
+            if should_flag:
+                errors.append(
+                    ValidationError(
+                        action_id=action.id,
+                        error_type="immutability",
+                        message="Cannot modify checked actions in PR. Checked actions are immutable.",
+                        line_number=action.line_number,
+                    )
                 )
-            )
 
     # Build result
     is_valid = len(errors) == 0
