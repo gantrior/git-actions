@@ -288,6 +288,83 @@ meta:
         os.unlink(temp_file)
 
 
+def test_validate_daily_file_checked_action_unchanged_file():
+    """Should allow checked actions in PR mode when file was not changed.
+
+    This tests the fix for the issue where the validator incorrectly
+    rejected unchanged files containing checked actions when using
+    wildcard patterns like --file 'actions/*.md'.
+    """
+    content = """- [x] `a1` — *test-action* v1.0
+```yaml
+inputs:
+  ticket: PROJ-123
+  comment: "Already executed"
+outputs:
+  commentUrl: "https://example.com"
+meta:
+  executedAt: "2026-01-15T14:32:11Z"
+```
+"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
+        f.write(content)
+        temp_file = f.name
+
+    try:
+        # file_changed=False means the file was not modified in the PR
+        result = validate_daily_file(
+            file_path=temp_file,
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
+            mode="pr",
+            file_changed=False,
+        )
+
+        # Should pass since file wasn't changed - no immutability error
+        assert result.is_valid is True
+        assert not any(e.error_type == "immutability" for e in result.errors)
+    finally:
+        os.unlink(temp_file)
+
+
+def test_validate_daily_file_checked_action_changed_file():
+    """Should reject checked actions in PR mode when file was changed.
+
+    This verifies that the immutability check still works correctly
+    when a file containing checked actions is actually modified.
+    """
+    content = """- [x] `a1` — *test-action* v1.0
+```yaml
+inputs:
+  ticket: PROJ-123
+  comment: "Already executed"
+outputs:
+  commentUrl: "https://example.com"
+meta:
+  executedAt: "2026-01-15T14:32:11Z"
+```
+"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
+        f.write(content)
+        temp_file = f.name
+
+    try:
+        # file_changed=True (default) means the file was modified in the PR
+        result = validate_daily_file(
+            file_path=temp_file,
+            allowlist_path="tests/fixtures/test-allowlist.yaml",
+            schemas_dir="tests/fixtures/",
+            mode="pr",
+            file_changed=True,
+        )
+
+        # Should fail since file was changed and has checked action
+        assert result.is_valid is False
+        assert any(e.error_type == "immutability" for e in result.errors)
+    finally:
+        os.unlink(temp_file)
+
+
 def test_validate_daily_file_multiple_errors():
     """Should collect all errors, not stop at first one."""
     content = """- [ ] `a1` — *invalid-action* v1.0

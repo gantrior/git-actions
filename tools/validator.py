@@ -267,7 +267,11 @@ def get_current_environment() -> str:
 
 
 def validate_daily_file(
-    file_path: str, allowlist_path: str, schemas_dir: str, mode: str = "pr"
+    file_path: str,
+    allowlist_path: str,
+    schemas_dir: str,
+    mode: str = "pr",
+    file_changed: bool = True,
 ) -> ValidationResult:
     """Validate all actions in a daily file.
 
@@ -276,6 +280,9 @@ def validate_daily_file(
         allowlist_path: Path to allowlist YAML file
         schemas_dir: Directory containing JSON schemas
         mode: Validation mode - "pr" (strict) or "execution" (lenient)
+        file_changed: Whether the file was modified in the PR. If False,
+            immutability checks are skipped for checked actions since
+            unchanged files should not trigger immutability errors.
 
     Returns:
         ValidationResult object with validation status and errors
@@ -391,8 +398,8 @@ def validate_daily_file(
                 )
             )
 
-        # Check immutability in PR mode
-        if mode == "pr" and action.is_checked:
+        # Check immutability in PR mode (only for files that were actually changed)
+        if mode == "pr" and action.is_checked and file_changed:
             errors.append(
                 ValidationError(
                     action_id=action.id,
