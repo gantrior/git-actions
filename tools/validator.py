@@ -272,7 +272,7 @@ def validate_daily_file(
     schemas_dir: str,
     mode: str = "pr",
     file_changed: bool = True,
-    modified_checked_actions: set = None,
+    modified_checked_actions: Optional[set] = None,
 ) -> ValidationResult:
     """Validate all actions in a daily file.
 

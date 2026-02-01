@@ -16,12 +16,13 @@ import glob
 import os
 import subprocess
 import sys
+from typing import Optional, Set
 
 from tools.parser import parse_daily_file
 from tools.validator import validate_daily_file
 
 
-def get_changed_files(base_ref: str) -> set:
+def get_changed_files(base_ref: str) -> Set[str]:
     """Get list of files changed compared to base ref.
 
     Args:
@@ -43,7 +44,7 @@ def get_changed_files(base_ref: str) -> set:
         return set()
 
 
-def get_file_content_from_ref(file_path: str, ref: str) -> str | None:
+def get_file_content_from_ref(file_path: str, ref: str) -> Optional[str]:
     """Get the content of a file at a specific git ref.
 
     Args:
@@ -66,7 +67,7 @@ def get_file_content_from_ref(file_path: str, ref: str) -> str | None:
         return None
 
 
-def get_checked_actions_modified(file_path: str, base_ref: str) -> set:
+def get_checked_actions_modified(file_path: str, base_ref: str) -> Set[str]:
     """Get the IDs of checked actions that were modified in the PR.
 
     Compares the current file content with the base ref to determine
