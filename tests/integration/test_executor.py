@@ -101,13 +101,13 @@ sys.stdout.flush()
 sys.exit(1)
 """)
         temp_script = f.name
-    
+
     os.chmod(temp_script, 0o755)
-    
+
     try:
         action_data = {"action": "test", "version": "1.0", "inputs": {}}
         result = execute_action_script(temp_script, action_data, timeout=10)
-        
+
         # Should capture the detailed error from JSON, not generic "Script exited with code 1"
         assert result["status"] == "error"
         assert result["error"] == "Detailed error from script"
