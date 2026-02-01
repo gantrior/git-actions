@@ -1,0 +1,42 @@
+# Pre-commit hooks configuration
+# https://pre-commit.com/
+
+# Set minimum pre-commit version for compatibility
+minimum_pre_commit_version: '3.0.0'
+
+repos:
+  # Standard pre-commit hooks for basic file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]  # Allow custom YAML tags used in actions
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Ruff - Fast Python linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.6
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  # Markdownlint - Markdown linting (matches CI configuration)
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.17.2
+    hooks:
+      - id: markdownlint-cli2
+        args: []
+
+# Configuration for CI environment (optional override)
+ci:
+  autofix_commit_msg: 'style: auto-fix pre-commit issues'
+  autoupdate_commit_msg: 'chore: pre-commit autoupdate'

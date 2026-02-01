@@ -14,7 +14,7 @@ This document captures research findings and design decisions for implementing h
 
 **Decision**: Use event-driven architecture with explicit lifecycle hooks
 
-**Rationale**: 
+**Rationale**:
 - The Actions-as-Markdown Framework already has a clear action lifecycle (parse → validate → execute)
 - Adding explicit hook points (before_execute, after_success, after_failure, after_timeout) provides clear extension points
 - Event-driven model allows multiple hooks to subscribe to the same lifecycle event without coupling
@@ -25,7 +25,7 @@ This document captures research findings and design decisions for implementing h
 - **Decorator-based hooks**: Rejected because Python decorators would require modifying action scripts, breaking the markdown-first approach
 - **Middleware chain**: Rejected because it implies sequential processing when hooks should be independent
 
-**References**: 
+**References**:
 - Existing `executor.py` has clear execution phases that can be extended
 - Django signals pattern (event-driven, decoupled)
 - GitHub Actions workflow hooks (on: success, on: failure)

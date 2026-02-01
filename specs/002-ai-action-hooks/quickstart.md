@@ -53,16 +53,16 @@ import requests
 def main():
     # Read context from stdin
     context = json.load(sys.stdin)
-    
+
     # Get configuration (from hooks.yaml config section)
     config = context.get('hook_config', {})
     api_url = config['task_api_url']
     api_key = os.getenv('TASK_API_KEY')
-    
+
     # Extract task information
     task_id = context['task_id']
     action_status = context['action_status']
-    
+
     # Update task via API
     try:
         response = requests.post(
@@ -72,7 +72,7 @@ def main():
             timeout=10
         )
         response.raise_for_status()
-        
+
         # Return success result to stdout
         result = {
             'success': True,
@@ -84,7 +84,7 @@ def main():
         }
         print(json.dumps(result))
         sys.exit(0)
-        
+
     except Exception as e:
         # Return failure result
         result = {
@@ -187,13 +187,13 @@ Choose the right event for your use case:
 
 - **before_execute**: Runs before the action starts
   - Use for: Pre-flight checks, resource allocation, audit logging
-  
+
 - **after_success**: Runs after action completes successfully
   - Use for: Task status updates, success notifications
-  
+
 - **after_failure**: Runs after action fails
   - Use for: Error notifications, rollback, incident creation
-  
+
 - **after_timeout**: Runs if action times out
   - Use for: Timeout notifications, cleanup
 
@@ -303,7 +303,7 @@ def test_hook():
         "action_status": "success",
         # ... other fields
     }
-    
+
     result = subprocess.run(
         ['python3', 'scripts/hooks/update_task.py'],
         input=json.dumps(context),
@@ -311,7 +311,7 @@ def test_hook():
         text=True,
         timeout=5
     )
-    
+
     assert result.returncode == 0
     output = json.loads(result.stdout)
     assert output['success'] == True

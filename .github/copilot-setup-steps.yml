@@ -1,0 +1,16 @@
+# Copilot Coding Agent Setup Steps
+# This file configures the automatic setup of the development environment
+# for the GitHub Copilot Coding Agent.
+#
+# These steps run when the agent starts working on this repository to ensure
+# that linting and code quality tools are properly configured.
+
+steps:
+  - name: Install Python dependencies
+    run: pip install -r requirements.txt
+
+  - name: Install pre-commit hooks
+    run: pre-commit install
+
+  - name: Verify pre-commit installation
+    run: pre-commit --version
