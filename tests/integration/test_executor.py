@@ -84,6 +84,67 @@ def test_execute_action_script_invalid_json_output():
         os.unlink(temp_script)
 
 
+def test_execute_action_script_nonzero_exit_with_json_error():
+    """Should parse JSON error from stdout even when script exits with non-zero code."""
+    # Create a script that outputs JSON error to stdout AND exits with code 1
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write("""#!/usr/bin/env python3
+import sys
+import json
+
+# Output JSON error to stdout
+output = {"status": "error", "outputs": {}, "error": "Detailed error from script"}
+json.dump(output, sys.stdout)
+sys.stdout.flush()
+
+# Exit with non-zero code
+sys.exit(1)
+""")
+        temp_script = f.name
+    
+    os.chmod(temp_script, 0o755)
+    
+    try:
+        action_data = {"action": "test", "version": "1.0", "inputs": {}}
+        result = execute_action_script(temp_script, action_data, timeout=10)
+        
+        # Should capture the detailed error from JSON, not generic "Script exited with code 1"
+        assert result["status"] == "error"
+        assert result["error"] == "Detailed error from script"
+        assert "Script exited with code" not in result["error"]
+    finally:
+        os.unlink(temp_script)
+
+
+def test_execute_action_script_nonzero_exit_without_json_uses_stderr():
+    """Should fall back to stderr when script exits non-zero without valid JSON."""
+    # Create a script that outputs to stderr and exits with code 1
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write("""#!/usr/bin/env python3
+import sys
+
+# Write error to stderr, nothing to stdout
+sys.stderr.write("Error from stderr")
+sys.stderr.flush()
+
+# Exit with non-zero code
+sys.exit(1)
+""")
+        temp_script = f.name
+    
+    os.chmod(temp_script, 0o755)
+    
+    try:
+        action_data = {"action": "test", "version": "1.0", "inputs": {}}
+        result = execute_action_script(temp_script, action_data, timeout=10)
+        
+        # Should capture error from stderr
+        assert result["status"] == "error"
+        assert "Error from stderr" in result["error"]
+    finally:
+        os.unlink(temp_script)
+
+
 def test_execute_actions_from_file():
     """Should execute pending actions from file."""
     # Create a temporary allowlist with mock script
