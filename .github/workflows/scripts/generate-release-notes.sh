@@ -15,15 +15,14 @@ LAST_TAG="$2"
 
 # Get commits since last tag
 if [ "$LAST_TAG" = "v0.0.0" ]; then
-  # Check how many commits we have and use that as the limit
-  COMMIT_COUNT=$(git rev-list --count HEAD)
-  if [ "$COMMIT_COUNT" -gt 10 ]; then
-    COMMITS=$(git log --oneline --pretty=format:"- %s" HEAD~10..HEAD)
-  else
-    COMMITS=$(git log --oneline --pretty=format:"- %s" HEAD~$COMMIT_COUNT..HEAD 2>/dev/null || git log --oneline --pretty=format:"- %s")
-  fi
+  # First release - show a welcome message instead of full history
+  COMMITS="- Initial release of Actions As Markdown framework"
 else
-  COMMITS=$(git log --oneline --pretty=format:"- %s" $LAST_TAG..HEAD)
+  COMMITS=$(git log --oneline --pretty=format:"- %s" "$LAST_TAG"..HEAD)
+  # If no commits (tag is at HEAD), indicate this is a workflow-triggered release
+  if [ -z "$COMMITS" ]; then
+    COMMITS="- Release workflow updates"
+  fi
 fi
 
 # Create release notes
